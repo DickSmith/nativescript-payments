@@ -1,0 +1,15 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
+}
+
+dependencies {
+    compile 'com.android.billingclient:billing:dp-1'
+}
+
+task getDeps(type: Copy) {
+    from configurations.compile
+    into '../lib'
+}
