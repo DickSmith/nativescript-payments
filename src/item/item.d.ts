@@ -2,7 +2,7 @@ import { BaseItem } from './item.common';
 import SkuDetails = com.android.billingclient.api.SkuDetails;
 
 export declare class Item extends BaseItem {
-    constructor(nativeValue: SkuDetails | SKProduct);
+    public readonly debug: string | null;
 
-    readonly debug: string;
+    constructor(nativeValue: SkuDetails | SKProduct);
 }

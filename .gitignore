@@ -26,14 +26,14 @@ publish/package
 *.d.ts
 !/src/typings/*.d.ts
 !/src/references.d.ts
-!/src/payments.d.ts
-!/src/index.d.ts
-!/src/item/item.d.ts
-!/src/order/order.d.ts
-!/demo/references.d.ts
-
 !/src/.idea/
 !/demo/.idea/
+!/demo/references.d.ts
+!/src/index.d.ts
+
+!/src/payments.d.ts
+!/src/item/item.d.ts
+!/src/order/order.d.ts
 !/.idea/nativescript-payments.iml
 # coming soon
 /demo/**/*

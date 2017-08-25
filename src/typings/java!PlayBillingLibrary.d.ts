@@ -1,15 +1,5 @@
-/* tslint:disable:no-unused-variable */
+/* tslint:disable:no-unused-variable no-internal-module no-namespace max-classes-per-file ban-types */
 /* tslint:disable indent max-line-length member-ordering unified-signatures member-access semicolon trailing-comma */
-
-import Activity = android.app.Activity;
-import ArrayList = java.util.ArrayList;
-import Bundle = android.os.Bundle;
-import ComponentName = android.content.ComponentName;
-import Context = android.content.Context;
-import IBinder = android.os.IBinder;
-import Intent = android.content.Intent;
-import List = java.util.List;
-import Object = java.lang.Object;
 
 declare module com {
     export module android {

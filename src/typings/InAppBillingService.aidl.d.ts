@@ -1,4 +1,4 @@
-/* tslint:disable:no-unused-variable */
+/* tslint:disable:no-unused-variable no-internal-module no-namespace max-classes-per-file ban-types */
 /* tslint:disable indent max-line-length member-ordering unified-signatures member-access semicolon trailing-comma */
 
 /*
@@ -144,7 +144,7 @@ declare namespace com {
                      *        owned skus.
                      * @return Bundle containing the following key-value pairs
                      *         "RESPONSE_CODE" with int value, RESULT_OK(0) if success, appropriate response codes
-                     on failures.
+                     *         on failures.
                      *         "INAPP_PURCHASE_ITEM_LIST" - StringArrayList containing the list of SKUs
                      *         "INAPP_PURCHASE_DATA_LIST" - StringArrayList containing the purchase information
                      *         "INAPP_DATA_SIGNATURE_LIST"- StringArrayList containing the signatures

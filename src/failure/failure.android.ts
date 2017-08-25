@@ -1,4 +1,7 @@
-import { BaseFailure, FailureTypes } from './failure.common';
+import {
+    BaseFailure,
+    FailureTypes,
+} from './failure.common';
 import BillingResponse = com.android.billingclient.api.BillingClient.BillingResponse;
 
 export class Failure extends BaseFailure {

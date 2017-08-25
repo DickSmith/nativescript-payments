@@ -28,7 +28,7 @@ export function _notify(eventContext: EventContext,
                         eventResult: EventResult,
                         payload: PaymentPayload): void {
     if ( _observers[eventContext] ) {
-        _observers[eventContext].forEach((callback) => {
+        _observers[eventContext].forEach((callback: EventHandler) => {
             callback(eventResult, payload);
         });
     }

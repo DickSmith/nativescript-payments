@@ -1,10 +1,16 @@
-import { BaseOrder, OrderState } from './order.common';
-
+import {
+    BaseOrder,
+    OrderState,
+} from './order.common';
 import Purchase = com.android.billingclient.api.Purchase;
 
 export class Order extends BaseOrder {
+    public nativeValue: Purchase;
 
-    constructor(nativeValue: Purchase, restored: boolean = false) {
+    constructor(
+        nativeValue: Purchase,
+        restored: boolean = false,
+    ) {
         super(nativeValue, restored);
         switch ( nativeValue.getPurchaseState() ) {
             case Purchase.PurchaseState.PURCHASED:
@@ -22,11 +28,11 @@ export class Order extends BaseOrder {
         this.receiptToken = nativeValue.getPurchaseToken();
         this.dataSignature = nativeValue.getSignature();
         this.orderId = nativeValue.getOrderId();
-        this.userData = JSON.parse(nativeValue.getOriginalJson()).developerPayload;
+        this.userData = <string>(<any>JSON.parse(nativeValue.getOriginalJson())).developerPayload;
         this.orderDate = new Date(nativeValue.getPurchaseTime());
     }
 
     get debug(): string {
-        return (<Purchase>this.nativeValue).getOriginalJson();
+        return this.nativeValue.getOriginalJson();
     }
 }

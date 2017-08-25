@@ -1,6 +1,8 @@
 import { BaseItem } from './item.common';
 
 export class Item extends BaseItem {
+    public nativeValue: SKProduct;
+
     constructor(nativeValue: SKProduct) {
         super(nativeValue);
 
@@ -13,15 +15,15 @@ export class Item extends BaseItem {
         this.localizedTitle = nativeValue.localizedTitle;
         this.priceAmount = nativeValue.price.doubleValue;
         this.priceFormatted = formatter.stringFromNumber(nativeValue.price as any);
-        this.priceCurrencyCode = nativeValue.priceLocale.objectForKey(NSLocaleCurrencyCode);
+        this.priceCurrencyCode = <string>nativeValue.priceLocale.objectForKey(NSLocaleCurrencyCode);
     }
 
-    public get debug(): string {
+    public get debug(): string | null {
         if ( this.nativeValue ) {
-            const temp = {};
+            const temp: any = {};
             for ( const i in this.nativeValue ) {
-                if ( this.nativeValue[i] != null ) {
-                    temp[i] = this.nativeValue[i];
+                if ( (<any>this.nativeValue)[i] != null ) {
+                    temp[i] = (<any>this.nativeValue)[i];
                 }
             }
 

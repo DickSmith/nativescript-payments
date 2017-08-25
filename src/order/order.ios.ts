@@ -1,7 +1,15 @@
-import { BaseOrder, OrderState } from './order.common';
+import {
+    BaseOrder,
+    OrderState,
+} from './order.common';
 
 export class Order extends BaseOrder {
-    constructor(nativeValue: SKPaymentTransaction, restored: boolean = false) {
+    public nativeValue: SKPaymentTransaction;
+
+    constructor(
+        nativeValue: SKPaymentTransaction,
+        restored: boolean = false,
+    ) {
         super(nativeValue, restored);
 
         switch ( nativeValue.transactionState ) {
@@ -25,17 +33,17 @@ export class Order extends BaseOrder {
         this.orderId = nativeValue.transactionIdentifier;
         this.orderDate = nativeValue.transactionDate;
         this.receiptToken = nativeValue.transactionReceipt
-            .base64EncodedStringWithOptions(NSDataBase64EncodingOptions.Encoding64CharacterLineLength);
+                                       .base64EncodedStringWithOptions(NSDataBase64EncodingOptions.Encoding64CharacterLineLength);
         this.userData = nativeValue.payment.applicationUsername;
 
     }
 
-    get debug(): any {
+    get debug(): string | null {
         if ( this.nativeValue ) {
-            const temp = {};
+            const temp: any = {};
             for ( const i in this.nativeValue ) {
-                if ( this.nativeValue[i] != null ) {
-                    temp[i] = this.nativeValue[i];
+                if ( (<any>this.nativeValue)[i] != null ) {
+                    temp[i] = (<any>this.nativeValue)[i];
                 }
             }
 

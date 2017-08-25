@@ -1,8 +1,8 @@
 import SkuDetails = com.android.billingclient.api.SkuDetails;
 
 export abstract class BaseItem {
-    public nativeValue: SkuDetails | SKProduct;
-    public abstract readonly debug: string;
+    public abstract nativeValue: SkuDetails | SKProduct;
+    public abstract readonly debug: string | null;
 
     public itemId: string;
     public localizedTitle: string;

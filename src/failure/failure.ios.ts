@@ -1,10 +1,13 @@
-import { BaseFailure, FailureTypes } from './failure.common';
+import {
+    BaseFailure,
+    FailureTypes,
+} from './failure.common';
 
 export class Failure extends BaseFailure {
 
     constructor(errorCode: number) {
         super(errorCode);
-        switch (errorCode) { // TODO Handle Domain?
+        switch ( errorCode ) { // TODO Handle Domain?
             case SKErrorCode.Unknown: /*0*/
                 this._type = FailureTypes.UNSPECIFIED;
                 this._description = 'Indicates that an unknown or unexpected error occurred.';
@@ -21,8 +24,8 @@ export class Failure extends BaseFailure {
                 this._type = FailureTypes.DEVELOPER_USAGE;
                 this._description = 'Indicates that one of the payment parameters was not recognized by the Apple App Store.';
                 break;
-            case SKErrorCode.PaymentNotAllowed:
-                this._type = FailureTypes.BILLING_AVAILABILITY; /*4*/
+            case SKErrorCode.PaymentNotAllowed: /*4*/
+                this._type = FailureTypes.BILLING_AVAILABILITY;
                 this._description = 'Indicates that the user is not allowed to authorize payments.';
                 break;
             case SKErrorCode.StoreProductNotAvailable: /*5*/

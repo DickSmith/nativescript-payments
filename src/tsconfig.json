@@ -18,15 +18,24 @@
     "allowUnusedLabels": false,
     "noEmitHelpers": true,
     "noEmitOnError": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": false,
     "noUnusedLocals": true,
     "noImplicitThis": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "references.d.ts",
+    // references
+    "node_modules/tns-platform-declarations/android.d.ts",
+    "node_modules/tns-platform-declarations/ios.d.ts",
+    "typings/InAppBillingService.aidl.d.ts",
+    "typings/java!PlayBillingLibrary.d.ts",
+    // sources
     "failure/**/*",
     "item/**/*",
     "order/**/*",

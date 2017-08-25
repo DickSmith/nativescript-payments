@@ -2,13 +2,13 @@ import { Failure } from './failure/failure';
 import { Item } from './item/item';
 import { Order } from './order/order';
 import { OrderState } from './order/order.common';
-import { EventContext, EventResult, _notify } from './payments.common';
+import { _notify, EventContext, EventResult } from './payments.common';
 
 export * from './payments.common';
 
-let _productRequest: SKProductsRequest;
-let _productRequestDelegate: SKProductRequestDelegateImpl;
-let _paymentTransactionObserver: SKPaymentTransactionObserverImpl;
+let _productRequest: SKProductsRequest | null;
+let _productRequestDelegate: SKProductRequestDelegateImpl | null;
+let _paymentTransactionObserver: SKPaymentTransactionObserverImpl | null;
 
 export function connect(): void {
     if ( !_paymentTransactionObserver ) {
@@ -34,7 +34,7 @@ export function disconnect(): void {
 export function fetchItems(itemIds: Array<string>): void {
     _notify(EventContext.RETRIEVING_ITEMS, EventResult.STARTED, itemIds);
     const productIds: NSMutableSet<string> = NSMutableSet.alloc<string>().init();
-    itemIds.forEach((value) => productIds.addObject(value));
+    itemIds.forEach((value: string) => productIds.addObject(value));
     _productRequest = SKProductsRequest.alloc().initWithProductIdentifiers(productIds);
     /* tslint:disable: no-use-before-declare */
     _productRequestDelegate = new SKProductRequestDelegateImpl();
@@ -63,7 +63,7 @@ export function buyItem(item: Item,
 export function finalizeOrder(order: Order): void {
     _notify(EventContext.FINALIZING_ORDER, EventResult.STARTED, order);
     if ( order.state === OrderState.VALID && !order.restored ) {
-        SKPaymentQueue.defaultQueue().finishTransaction(order.nativeValue);
+        SKPaymentQueue.defaultQueue().finishTransaction(<SKPaymentTransaction>order.nativeValue);
         _notify(EventContext.FINALIZING_ORDER, EventResult.PENDING, order);
     } else {
         _notify(EventContext.FINALIZING_ORDER, EventResult.FAILURE, new Failure(999));
@@ -79,8 +79,11 @@ export function canMakePayments(): boolean { // TODO ?
     return SKPaymentQueue.canMakePayments();
 }
 
+/* tslint:disable: max-classes-per-file */
 class SKProductRequestDelegateImpl extends NSObject implements SKProductsRequestDelegate {
+    /* tslint:disable: variable-name */
     public static ObjCProtocols = [SKProductsRequestDelegate];
+    /* tslint:enable: variable-name */
 
     public productsRequestDidReceiveResponse(request: SKProductsRequest,
                                              response: SKProductsResponse) {
@@ -109,7 +112,9 @@ class SKProductRequestDelegateImpl extends NSObject implements SKProductsRequest
 }
 
 class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTransactionObserver {
+    /* tslint:disable: variable-name */
     public static ObjCProtocols = [SKPaymentTransactionObserver];
+    /* tslint:enable: variable-name */
 
     public paymentQueueUpdatedTransactions(queue: SKPaymentQueue,
                                            transactions: NSArray<SKPaymentTransaction>): void {
@@ -161,7 +166,9 @@ function _transactionHandler(queue: SKPaymentQueue,
                 break;
             default:
                 console.error(new Error('Missing or unknown transaction state.'));
+                break;
         }
     }
     _notify(EventContext.PROCESSING_ORDER, EventResult.PENDING, queue.transactions.count);
 }
+/* tslint:enable: max-classes-per-file */

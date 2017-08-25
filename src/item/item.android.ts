@@ -2,6 +2,8 @@ import { BaseItem } from './item.common';
 import SkuDetails = com.android.billingclient.api.SkuDetails;
 
 export class Item extends BaseItem {
+    public nativeValue: SkuDetails;
+
     constructor(nativeValue: SkuDetails) {
         super(nativeValue);
 
@@ -15,6 +17,6 @@ export class Item extends BaseItem {
     }
 
     public get debug(): string {
-        return (<SkuDetails>this.nativeValue).toString();
+        return this.nativeValue.toString();
     }
 }

@@ -1,6 +1,8 @@
+import Purchase = com.android.billingclient.api.Purchase;
+
 export abstract class BaseOrder {
-    public nativeValue: any;
-    public abstract readonly debug: string;
+    public abstract nativeValue: Purchase | SKPaymentTransaction;
+    public abstract readonly debug: string | null;
 
     public state: OrderState;
     public itemId: string;
@@ -12,15 +14,17 @@ export abstract class BaseOrder {
     /** Android only */
     public dataSignature: string;
 
-    constructor(nativeValue: any,
-                restored: boolean = false) {
+    constructor(
+        nativeValue: Purchase | SKPaymentTransaction,
+        restored: boolean = false,
+    ) {
         this.nativeValue = nativeValue;
         this.restored = restored;
     }
 }
 
 export enum OrderState {
-    INVALID = 'INVALID',
+    INVALID     = 'INVALID',
     PROVISIONAL = 'PROVISIONAL',
-    VALID = 'VALID',
+    VALID       = 'VALID',
 }

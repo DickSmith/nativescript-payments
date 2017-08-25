@@ -1,5 +1,5 @@
 export abstract class BaseFailure {
-    protected _type: FailureTypes;
+    protected _type: FailureTypes | null;
     protected _description: string;
     protected _nativeCode: number;
 
@@ -7,7 +7,7 @@ export abstract class BaseFailure {
         this._nativeCode = errorCode;
     }
 
-    public get type(): FailureTypes {
+    public get type(): FailureTypes | null {
         return this._type;
     }
 
@@ -21,13 +21,12 @@ export abstract class BaseFailure {
 }
 
 export enum FailureTypes {
-    PRODUCT_UNAVAILABLE = 'PRODUCT_UNAVAILABLE',
-    DEVELOPER_USAGE = 'DEVELOPER_USAGE',
+    PRODUCT_UNAVAILABLE   = 'PRODUCT_UNAVAILABLE',
+    DEVELOPER_USAGE       = 'DEVELOPER_USAGE',
     PRODUCT_ALREADY_OWNED = 'PRODUCT_ALREADY_OWNED',
-    PRODUCT_NOT_OWNED = 'PRODUCT_NOT_OWNED',
-    USER_CANCELLED = 'USER_CANCELLED',
-    NETWORK_AVAILABILITY = 'NETWORK_AVAILABILITY',
-    BILLING_AVAILABILITY = 'BILLING_AVAILABILITY',
-    UNSPECIFIED = 'UNSPECIFIED',
+    PRODUCT_NOT_OWNED     = 'PRODUCT_NOT_OWNED',
+    USER_CANCELLED        = 'USER_CANCELLED',
+    NETWORK_AVAILABILITY  = 'NETWORK_AVAILABILITY',
+    BILLING_AVAILABILITY  = 'BILLING_AVAILABILITY',
+    UNSPECIFIED           = 'UNSPECIFIED',
 }
-
