@@ -3,6 +3,7 @@ import { Failure } from './failure/failure';
 import { Item } from './item/item';
 import { Order } from './order/order';
 import { _notify, EventContext, EventResult } from './payments.common';
+import { OrderState } from './order/order.common';
 
 // java
 import ArrayList = java.util.ArrayList;
@@ -26,7 +27,6 @@ import BillingFlowParams = com.android.billingclient.api.BillingFlowParams;
 import ConsumeResponseListener = com.android.billingclient.api.ConsumeResponseListener;
 
 import PurchasesResult = com.android.billingclient.api.Purchase.PurchasesResult;
-import { OrderState } from './order/order.common';
 
 
 export * from './payments.common';
@@ -96,7 +96,7 @@ export function fetchItems(itemIds: Array<string>): void {
                     }
                     _notify(EventContext.RETRIEVING_ITEMS, EventResult.SUCCESS, products);
                 } else {
-                    _notify(EventContext.RETRIEVING_ITEMS, EventResult.PENDING, new Failure(responseCode));
+                    _notify(EventContext.RETRIEVING_ITEMS, EventResult.FAILURE, new Failure(responseCode));
                 }
             },
         }));
