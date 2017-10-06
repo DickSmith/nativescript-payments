@@ -39,3 +39,32 @@ Describe your plugin methods and properties here. See [nativescript-feedback](ht
 
 Apache License Version 2.0, January 2004
 
+## Dumping typings...
+##### iOS
+From `src/`:
+```sh
+pod repo update
+TNS_TYPESCRIPT_DECLARATIONS_PATH="$(pwd)/typings" npm run demo.ios
+cp typings/x86_64/objc\!Zendesk* typings/
+```
+
+##### Android
+From project root:
+```sh
+cd android
+./gradlew clean
+./gradlew getDeps
+
+cd lib
+jar xf billing-1.0.aar
+mv classes.jar used-billing.jar
+
+rm -rf */
+find . -type f ! -iname "used-*" -delete
+cd ../..
+
+rm -rf out/
+java -jar ../android-dts-generator/dts-generator/build/libs/dts-generator.jar -input \
+    android/lib/used-billing.jar \
+    && mv out/android.d.ts src/typings/java\!PlayBillingLibrary.d.ts;
+```

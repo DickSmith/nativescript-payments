@@ -14,7 +14,6 @@
 !/order/*.js
 !/index.d.ts
 !/payments.d.ts
-!/payments.common.d.ts
 !/payments.android.js
 !/payments.ios.js
 !/payments.common.js

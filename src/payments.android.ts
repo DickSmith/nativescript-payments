@@ -2,16 +2,17 @@ import * as TnsApplication from 'tns-core-modules/application';
 import { Failure } from './failure/failure';
 import { Item } from './item/item';
 import { Order } from './order/order';
-import { _notify, EventContext, EventResult } from './payments.common';
 import { OrderState } from './order/order.common';
-
+import {
+    _payments$,
+    EventContext,
+    EventResult,
+} from './payments.common';
 // java
 import ArrayList = java.util.ArrayList;
 import List = java.util.List;
-
 // android
 import Context = android.content.Context;
-
 // android billing
 import Purchase = com.android.billingclient.api.Purchase;
 import BillingClient = com.android.billingclient.api.BillingClient;
@@ -25,38 +26,60 @@ import SkuDetails = com.android.billingclient.api.SkuDetails;
 import SkuDetailsResult = com.android.billingclient.api.SkuDetails.SkuDetailsResult;
 import BillingFlowParams = com.android.billingclient.api.BillingFlowParams;
 import ConsumeResponseListener = com.android.billingclient.api.ConsumeResponseListener;
-
 import PurchasesResult = com.android.billingclient.api.Purchase.PurchasesResult;
 
-
-export * from './payments.common';
+export {
+    EventContext,
+    EventResult,
+    EventPayload,
+    IPaymentEvent,
+    payments$,
+} from './payments.common';
 
 let _billingClient: BillingClient | null;
 
 export function connect(): void {
     if ( !_billingClient ) {
-        _notify(EventContext.CONNECTING_STORE, EventResult.STARTED, null);
+        _payments$.next({
+            context : EventContext.CONNECTING_STORE,
+            result :  EventResult.STARTED,
+            payload : null,
+        });
         if ( TnsApplication.android && <Context>TnsApplication.android.context ) {
             _billingClient = new BillingClient.Builder(TnsApplication.android.context)
                 .setListener(new PurchasesUpdatedListener({
-                    onPurchasesUpdated(responseCode: number,
-                                       purchases: List<Purchase>): void {
+                    onPurchasesUpdated(
+                        responseCode: number,
+                        purchases: List<Purchase>,
+                    ): void {
                         _purchaseHandler(responseCode, purchases);
                     },
                 }))
                 .build();
-            _notify(EventContext.CONNECTING_STORE, EventResult.PENDING, null);
+            _payments$.next({
+                context : EventContext.CONNECTING_STORE,
+                result :  EventResult.PENDING,
+                payload : null,
+            });
             _billingClient.startConnection(new BillingClientStateListener({
                 onBillingSetupFinished(resultCode: number): void {
-                    if (_billingClient) {
+                    if ( _billingClient ) {
                         if ( resultCode === BillingResponse.OK ) {
                             // Handle transactions already in queue
                             const purchaseResult: PurchasesResult = _billingClient.queryPurchases(SkuType.INAPP); // TODO
                             _purchaseHandler(purchaseResult.getResponseCode(), purchaseResult.getPurchasesList());
-                            _notify(EventContext.CONNECTING_STORE, EventResult.SUCCESS, null);
+                            _payments$.next({
+                                context : EventContext.CONNECTING_STORE,
+                                result :  EventResult.SUCCESS,
+                                payload : null,
+                            });
                         } else {
                             console.error(new Error('Connection failed with code: ' + resultCode));
-                            _notify(EventContext.CONNECTING_STORE, EventResult.FAILURE, new Failure(resultCode));
+                            _payments$.next({
+                                context : EventContext.CONNECTING_STORE,
+                                result :  EventResult.FAILURE,
+                                payload : new Failure(resultCode),
+                            });
                         }
                     } else {
                         console.error(new Error('BillingClient missing.'));
@@ -82,7 +105,11 @@ export function disconnect() {
 
 export function fetchItems(itemIds: Array<string>): void {
     if ( _billingClient ) {
-        _notify(EventContext.RETRIEVING_ITEMS, EventResult.STARTED, itemIds);
+        _payments$.next({
+            context : EventContext.RETRIEVING_ITEMS,
+            result :  EventResult.STARTED,
+            payload : itemIds,
+        });
         const _skuList: ArrayList<string> = new ArrayList<string>();
         itemIds.forEach((value: string) => _skuList.add(value)); // TODO ?
         _billingClient.querySkuDetailsAsync(SkuType.INAPP, _skuList, new SkuDetailsResponseListener({
@@ -94,28 +121,46 @@ export function fetchItems(itemIds: Array<string>): void {
                     for ( let i = 0; i < skuDetailsList.size(); i++ ) {
                         products.push(new Item(skuDetailsList.get(i)));
                     }
-                    _notify(EventContext.RETRIEVING_ITEMS, EventResult.SUCCESS, products);
+                    _payments$.next({
+                        context : EventContext.RETRIEVING_ITEMS,
+                        result :  EventResult.SUCCESS,
+                        payload : products,
+                    });
                 } else {
-                    _notify(EventContext.RETRIEVING_ITEMS, EventResult.FAILURE, new Failure(responseCode));
+                    _payments$.next({
+                        context : EventContext.RETRIEVING_ITEMS,
+                        result :  EventResult.FAILURE,
+                        payload : new Failure(responseCode),
+                    });
                 }
             },
         }));
-        _notify(EventContext.RETRIEVING_ITEMS, EventResult.PENDING, itemIds);
+        _payments$.next({
+            context : EventContext.RETRIEVING_ITEMS,
+            result :  EventResult.PENDING,
+            payload : itemIds,
+        });
     } else {
         console.error(new Error('BillingClient missing.'));
     }
 }
 
-export function buyItem(item: Item,
-                        userData?: string): void {
+export function buyItem(
+    item: Item,
+    userData?: string,
+): void {
     if ( _billingClient ) {
         const pendingCount = _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(); // TODO inapp? safe?
         if ( !pendingCount ) {
-            _notify(EventContext.PROCESSING_ORDER, EventResult.PENDING, pendingCount + 1); // TODO elsewhere ?
-            const paramsBuilder  = new BillingFlowParams.Builder()
+            _payments$.next({
+                context : EventContext.PROCESSING_ORDER,
+                result :  EventResult.PENDING,
+                payload : pendingCount + 1,
+            }); // TODO elsewhere ?
+            const paramsBuilder = new BillingFlowParams.Builder()
                 .setSku(item.itemId)
                 .setType(SkuType.INAPP);
-            if (userData) {
+            if ( userData ) {
                 paramsBuilder.setAccountId(userData);
             }
             const responseCode: number = _billingClient.launchBillingFlow(
@@ -123,12 +168,24 @@ export function buyItem(item: Item,
                 paramsBuilder.build(),
             );
             if ( responseCode === BillingResponse.OK ) {
-                _notify(EventContext.PROCESSING_ORDER, EventResult.STARTED, item);
+                _payments$.next({
+                    context : EventContext.PROCESSING_ORDER,
+                    result :  EventResult.STARTED,
+                    payload : item,
+                });
             } else {
-                _notify(EventContext.PROCESSING_ORDER, EventResult.FAILURE, new Failure(responseCode));
+                _payments$.next({
+                    context : EventContext.PROCESSING_ORDER,
+                    result :  EventResult.FAILURE,
+                    payload : new Failure(responseCode),
+                });
             }
         } else {
-            _notify(EventContext.PROCESSING_ORDER, EventResult.PENDING, pendingCount);
+            _payments$.next({
+                context : EventContext.PROCESSING_ORDER,
+                result :  EventResult.PENDING,
+                payload : pendingCount,
+            });
         }
     } else {
         console.error(new Error('BillingClient missing.'));
@@ -137,30 +194,52 @@ export function buyItem(item: Item,
 
 export function finalizeOrder(order: Order): void {
     if ( _billingClient ) {
-        _notify(EventContext.FINALIZING_ORDER, EventResult.STARTED, order);
+        _payments$.next({
+            context : EventContext.FINALIZING_ORDER,
+            result :  EventResult.STARTED,
+            payload : order,
+        });
         if ( order.state === OrderState.VALID && !order.restored ) {
             _billingClient.consumeAsync(order.receiptToken, new ConsumeResponseListener({
-                onConsumeResponse(purchaseToken: string,
-                                  resultCode: number): void {
-                    if (_billingClient) {
+                onConsumeResponse(
+                    purchaseToken: string,
+                    resultCode: number,
+                ): void {
+                    if ( _billingClient ) {
                         if ( resultCode === BillingResponse.OK ) {
-                            _notify(EventContext.FINALIZING_ORDER, EventResult.SUCCESS, new Order(order.nativeValue));
+                            _payments$.next({
+                                context : EventContext.FINALIZING_ORDER,
+                                result :  EventResult.SUCCESS,
+                                payload : new Order(order.nativeValue),
+                            });
                         } else {
-                            _notify(EventContext.FINALIZING_ORDER, EventResult.FAILURE, new Failure(resultCode));
+                            _payments$.next({
+                                context : EventContext.FINALIZING_ORDER,
+                                result :  EventResult.FAILURE,
+                                payload : new Failure(resultCode),
+                            });
                         }
-                        _notify(
-                            EventContext.PROCESSING_ORDER,
-                            EventResult.PENDING,
-                            _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size()
-                        ); // TODO is it safe? elsewhere?
+                        _payments$.next({
+                            context : EventContext.PROCESSING_ORDER,
+                            result :  EventResult.PENDING,
+                            payload : _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(),
+                        }); // TODO is it safe? elsewhere?
                     } else {
                         console.error(new Error('BillingClient missing.'));
                     }
                 },
             }));
-            _notify(EventContext.FINALIZING_ORDER, EventResult.PENDING, order);
+            _payments$.next({
+                context : EventContext.FINALIZING_ORDER,
+                result :  EventResult.PENDING,
+                payload : order,
+            });
         } else {
-            _notify(EventContext.FINALIZING_ORDER, EventResult.FAILURE, new Failure(8));
+            _payments$.next({
+                context : EventContext.FINALIZING_ORDER,
+                result :  EventResult.FAILURE,
+                payload : new Failure(8),
+            });
         }
     } else {
         console.error(new Error('BillingClient missing.'));
@@ -169,7 +248,11 @@ export function finalizeOrder(order: Order): void {
 
 export function restoreOrders(): void {
     if ( _billingClient ) {
-        _notify(EventContext.RESTORING_ORDERS, EventResult.STARTED, null);
+        _payments$.next({
+            context : EventContext.RESTORING_ORDERS,
+            result :  EventResult.STARTED,
+            payload : null,
+        });
         _billingClient.queryPurchaseHistoryAsync(SkuType.INAPP, new PurchaseHistoryResponseListener({
             onPurchaseHistoryResponse(result: Purchase.PurchasesResult): void {
                 const responseCode: number = result.getResponseCode();
@@ -177,14 +260,30 @@ export function restoreOrders(): void {
                 if ( responseCode === BillingResponse.OK ) {
                     for ( let i = 0; i < purchases.size(); i++ ) {
                         const purchase: Purchase = purchases.get(i);
-                        if (purchase) {
-                            _notify(EventContext.PROCESSING_ORDER, EventResult.SUCCESS, new Order(purchase, true));
-                            _notify(EventContext.RESTORING_ORDERS, EventResult.PENDING, new Order(purchase, true));
+                        if ( purchase ) {
+                            _payments$.next({
+                                context : EventContext.PROCESSING_ORDER,
+                                result :  EventResult.SUCCESS,
+                                payload : new Order(purchase, true),
+                            });
+                            _payments$.next({
+                                context : EventContext.RESTORING_ORDERS,
+                                result :  EventResult.PENDING,
+                                payload : new Order(purchase, true),
+                            });
                         }
                     }
-                    _notify(EventContext.RESTORING_ORDERS, EventResult.SUCCESS, null);
+                    _payments$.next({
+                        context : EventContext.RESTORING_ORDERS,
+                        result :  EventResult.SUCCESS,
+                        payload : null,
+                    });
                 } else {
-                    _notify(EventContext.RESTORING_ORDERS, EventResult.FAILURE, new Failure(responseCode));
+                    _payments$.next({
+                        context : EventContext.RESTORING_ORDERS,
+                        result :  EventResult.FAILURE,
+                        payload : new Failure(responseCode),
+                    });
                 }
             },
         }));
@@ -197,29 +296,39 @@ export function canMakePayments(/*types*/): boolean {
     return true; // TODO isReady?
 }
 
-function _purchaseHandler(responseCode: number,
-                          purchases: List<Purchase>) {
-    if (_billingClient) {
-        _notify(
-            EventContext.PROCESSING_ORDER,
-            EventResult.PENDING,
-            _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(),
-        );  // TODO is it safe? elsewhere?
+function _purchaseHandler(
+    responseCode: number,
+    purchases: List<Purchase>,
+) {
+    if ( _billingClient ) {
+        _payments$.next({
+            context : EventContext.PROCESSING_ORDER,
+            result :  EventResult.PENDING,
+            payload : _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(),
+        });  // TODO is it safe? elsewhere?
         if ( responseCode === BillingResponse.OK ) {
             for ( let i = 0; i < purchases.size(); i++ ) {
                 const purchase: Purchase = purchases.get(i);
-                if (purchase) {
-                    _notify(EventContext.PROCESSING_ORDER, EventResult.SUCCESS, new Order(purchase));
+                if ( purchase ) {
+                    _payments$.next({
+                        context : EventContext.PROCESSING_ORDER,
+                        result :  EventResult.SUCCESS,
+                        payload : new Order(purchase),
+                    });
                 }
             }
         } else {
-            _notify(EventContext.PROCESSING_ORDER, EventResult.FAILURE, new Failure(responseCode));
+            _payments$.next({
+                context : EventContext.PROCESSING_ORDER,
+                result :  EventResult.FAILURE,
+                payload : new Failure(responseCode),
+            });
         }
-        _notify(
-            EventContext.PROCESSING_ORDER,
-            EventResult.PENDING,
-            _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(),
-        );  // TODO is it safe? elsewhere?
+        _payments$.next({
+            context : EventContext.PROCESSING_ORDER,
+            result :  EventResult.PENDING,
+            payload : _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(),
+        });  // TODO is it safe? elsewhere?
     } else {
         console.error(new Error('BillingClient missing.'));
     }

@@ -1,18 +1,10 @@
 import { Failure } from './failure/failure';
 import { Item } from './item/item';
 import { Order } from './order/order';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
-export * from './payments.common';
-export declare type PaymentPayload =
-    Failure
-    | Item
-    | Array<Item>
-    | Order
-    | Array<string>
-    | number
-    | null;
-export declare type EventHandler = (eventResult: EventResult,
-                                    payload: PaymentPayload) => void;
+export declare type EventPayload = Failure | Item | Order | Array<Item> | Array<string> | number | null;
 
 export declare enum EventResult {
     STARTED = 'STARTED',
@@ -29,15 +21,14 @@ export declare enum EventContext {
     RESTORING_ORDERS = 'RESTORING_ORDERS',
 }
 
-export declare function _notify(eventContext: EventContext,
-                                eventResult: EventResult,
-                                payload: PaymentPayload): void;
+export interface IPaymentEvent {
+    context: EventContext;
+    result: EventResult;
+    payload: EventPayload;
+}
 
-export declare function on(eventContext: EventContext,
-                           handler: EventHandler): void;
-
-export declare function off(eventContext: EventContext,
-                            handler?: EventHandler): void;
+export declare const _payments$: Subject<IPaymentEvent>;
+export declare const payments$: Observable<IPaymentEvent>;
 
 export declare function connect(): void;
 
@@ -45,8 +36,10 @@ export declare function disconnect(): void;
 
 export declare function fetchItems(itemIds: Array<string>): void;
 
-export declare function buyItem(item: Item,
-                                userData?: string): void;
+export declare function buyItem(
+    item: Item,
+    userData?: string,
+): void;
 
 export declare function finalizeOrder(order: Order): void;
 

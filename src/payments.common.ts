@@ -1,13 +1,10 @@
 import { Failure } from './failure/failure';
 import { Item } from './item/item';
 import { Order } from './order/order';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
-export type PaymentPayload = Failure | Item | Array<Item> | Order | Array<string> | number | null;
-
-export type EventHandler = (eventResult: EventResult,
-                            payload: PaymentPayload) => void;
-
-const _observers: { [eventContext: string]: Array<EventHandler> } = {};
+export type EventPayload = Failure | Item | Order | Array<Item> | Array<string> | number | null;
 
 export enum EventResult {
     STARTED = 'STARTED',
@@ -24,34 +21,23 @@ export enum EventContext {
     RESTORING_ORDERS = 'RESTORING_ORDERS',
 }
 
-export function _notify(eventContext: EventContext,
-                        eventResult: EventResult,
-                        payload: PaymentPayload): void {
-    if ( _observers[eventContext] ) {
-        _observers[eventContext].forEach((callback: EventHandler) => {
-            callback(eventResult, payload);
-        });
-    }
+export interface IPaymentEvent {
+    context: EventContext;
+    result: EventResult;
+    payload: EventPayload;
 }
 
-export function on(eventContext: EventContext,
-                   handler: EventHandler): void {
-    if ( !_observers[eventContext] ) {
-        _observers[eventContext] = [];
-    }
-    _observers[eventContext].push(handler);
-}
+export const _payments$: Subject<IPaymentEvent> = new Subject<IPaymentEvent>();
+export const payments$: Observable<IPaymentEvent> = _payments$.asObservable();
 
-export function off(eventContext: EventContext,
-                    handler?: EventHandler): void {
-    if ( _observers[eventContext] ) {
-        if ( handler ) {
-            const index = _observers[eventContext].indexOf(handler);
-            if ( index !== -1 ) {
-                _observers[eventContext].splice(index, 1);
-            }
-        } else {
-            delete _observers[eventContext];
-        }
-    }
-}
+// const _storeConnecting$: Subject<any> = new Subject<any>();
+// const _itemsRetrieving$: Subject<any> = new Subject<any>();
+// const _orderProcessing$: Subject<any> = new Subject<any>();
+// const _orderFinalizing$: Subject<any> = new Subject<any>();
+// const _ordersRestoring$: Subject<any> = new Subject<any>();
+//
+// export const storeConnecting$: Observable<any> = _storeConnecting$.asObservable();
+// export const itemsRetrieving$: Observable<any> = _itemsRetrieving$.asObservable();
+// export const orderProcessing$: Observable<any> = _orderProcessing$.asObservable();
+// export const orderFinalizing$: Observable<any> = _orderFinalizing$.asObservable();
+// export const ordersRestoring$: Observable<any> = _ordersRestoring$.asObservable();
