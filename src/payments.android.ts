@@ -23,10 +23,10 @@ import SkuType = com.android.billingclient.api.BillingClient.SkuType;
 import PurchaseHistoryResponseListener = com.android.billingclient.api.PurchaseHistoryResponseListener;
 import SkuDetailsResponseListener = com.android.billingclient.api.SkuDetailsResponseListener;
 import SkuDetails = com.android.billingclient.api.SkuDetails;
-import SkuDetailsResult = com.android.billingclient.api.SkuDetails.SkuDetailsResult;
 import BillingFlowParams = com.android.billingclient.api.BillingFlowParams;
 import ConsumeResponseListener = com.android.billingclient.api.ConsumeResponseListener;
 import PurchasesResult = com.android.billingclient.api.Purchase.PurchasesResult;
+import SkuDetailsParams = com.android.billingclient.api.SkuDetailsParams;
 
 export {
     EventContext,
@@ -46,7 +46,7 @@ export function connect(): void {
             payload : null,
         });
         if ( TnsApplication.android && <Context>TnsApplication.android.context ) {
-            _billingClient = new BillingClient.Builder(TnsApplication.android.context)
+            _billingClient = BillingClient.newBuilder(TnsApplication.android.context)
                 .setListener(new PurchasesUpdatedListener({
                     onPurchasesUpdated(
                         responseCode: number,
@@ -112,12 +112,12 @@ export function fetchItems(itemIds: Array<string>): void {
         });
         const _skuList: ArrayList<string> = new ArrayList<string>();
         itemIds.forEach((value: string) => _skuList.add(value)); // TODO ?
-        _billingClient.querySkuDetailsAsync(SkuType.INAPP, _skuList, new SkuDetailsResponseListener({
-            onSkuDetailsResponse(result: SkuDetailsResult): void {
-                const responseCode: number = result.getResponseCode();
+        const params: SkuDetailsParams.Builder = SkuDetailsParams.newBuilder();
+        params.setSkusList(_skuList).setType(SkuType.INAPP);
+        _billingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener({
+            onSkuDetailsResponse(responseCode: number, skuDetailsList: List<SkuDetails>): void {
                 if ( responseCode === BillingResponse.OK ) {
                     const products: Array<Item> = [];
-                    const skuDetailsList: List<SkuDetails> = result.getSkuDetailsList();
                     for ( let i = 0; i < skuDetailsList.size(); i++ ) {
                         products.push(new Item(skuDetailsList.get(i)));
                     }
@@ -157,7 +157,7 @@ export function buyItem(
                 result :  EventResult.PENDING,
                 payload : pendingCount + 1,
             }); // TODO elsewhere ?
-            const paramsBuilder = new BillingFlowParams.Builder()
+            const paramsBuilder = BillingFlowParams.newBuilder()
                 .setSku(item.itemId)
                 .setType(SkuType.INAPP);
             if ( userData ) {
@@ -202,11 +202,11 @@ export function finalizeOrder(order: Order): void {
         if ( order.state === OrderState.VALID && !order.restored ) {
             _billingClient.consumeAsync(order.receiptToken, new ConsumeResponseListener({
                 onConsumeResponse(
-                    purchaseToken: string,
-                    resultCode: number,
+                    responseCode: number,
+                    purchaseToken: string
                 ): void {
                     if ( _billingClient ) {
-                        if ( resultCode === BillingResponse.OK ) {
+                        if ( responseCode === BillingResponse.OK ) {
                             _payments$.next({
                                 context : EventContext.FINALIZING_ORDER,
                                 result :  EventResult.SUCCESS,
@@ -216,7 +216,7 @@ export function finalizeOrder(order: Order): void {
                             _payments$.next({
                                 context : EventContext.FINALIZING_ORDER,
                                 result :  EventResult.FAILURE,
-                                payload : new Failure(resultCode),
+                                payload : new Failure(responseCode),
                             });
                         }
                         _payments$.next({
@@ -254,12 +254,10 @@ export function restoreOrders(): void {
             payload : null,
         });
         _billingClient.queryPurchaseHistoryAsync(SkuType.INAPP, new PurchaseHistoryResponseListener({
-            onPurchaseHistoryResponse(result: Purchase.PurchasesResult): void {
-                const responseCode: number = result.getResponseCode();
-                const purchases: List<Purchase> = result.getPurchasesList();
+            onPurchaseHistoryResponse(responseCode: number, purchasesList: List<Purchase>): void {
                 if ( responseCode === BillingResponse.OK ) {
-                    for ( let i = 0; i < purchases.size(); i++ ) {
-                        const purchase: Purchase = purchases.get(i);
+                    for ( let i = 0; i < purchasesList.size(); i++ ) {
+                        const purchase: Purchase = purchasesList.get(i);
                         if ( purchase ) {
                             _payments$.next({
                                 context : EventContext.PROCESSING_ORDER,

@@ -13,7 +13,7 @@ export class Failure extends BaseFailure {
                 this._type = FailureTypes.BILLING_AVAILABILITY;
                 this._description = 'Requested feature is not supported by Play Store on the current device.';
                 break;
-            case BillingResponse.SERVICE_DISCONNECTED:
+            case BillingResponse.SERVICE_DISCONNECTED: /*-1*/
                 this._type = FailureTypes.BILLING_AVAILABILITY;
                 this._description = 'Play Store service is not connected now - potentially transient state.';
                 break;

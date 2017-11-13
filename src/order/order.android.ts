@@ -11,14 +11,14 @@ export class Order extends BaseOrder {
         nativeValue: Purchase,
         restored: boolean = false,
     ) {
+        const jsonObject: any = JSON.parse(nativeValue.getOriginalJson());
         super(nativeValue, restored);
-        switch ( nativeValue.getPurchaseState() ) {
-            case Purchase.PurchaseState.PURCHASED:
+        switch ( jsonObject.purchaseState ) { // number or "number"?
+            case 0: // Purchased
                 this.state = OrderState.VALID;
                 break;
-
-            case Purchase.PurchaseState.CANCELED:
-            case Purchase.PurchaseState.REFUNDED:
+            case 1: // Canceled
+            case 2: // Refunded
             default:
                 this.state = OrderState.INVALID;
                 break;
@@ -28,7 +28,7 @@ export class Order extends BaseOrder {
         this.receiptToken = nativeValue.getPurchaseToken();
         this.dataSignature = nativeValue.getSignature();
         this.orderId = nativeValue.getOrderId();
-        this.userData = <string>(<any>JSON.parse(nativeValue.getOriginalJson())).developerPayload;
+        this.userData = jsonObject.developerPayload;
         this.orderDate = new Date(nativeValue.getPurchaseTime());
     }
 

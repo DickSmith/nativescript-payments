@@ -40,9 +40,9 @@ export class Failure extends BaseFailure {
                 this._type = FailureTypes.NETWORK_AVAILABILITY;
                 this._description = 'Indicates that the device could not connect to the network.';
                 break;
-            case 8: /*SKErrorCode.CloudServiceRevoked*/
+            case SKErrorCode.CloudServiceRevoked: /*8*/
                 this._type = FailureTypes.BILLING_AVAILABILITY;
-                this._description = 'New to iOS 10.3 and currently undocumented.';
+                this._description = 'Indicates that the user has revoked permission to use this cloud service.';
                 break;
             case 999: /*Custom for attempting to finish an incomplete transaction*/
                 this._type = FailureTypes.PRODUCT_NOT_OWNED;
