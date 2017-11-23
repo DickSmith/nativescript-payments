@@ -261,10 +261,12 @@ declare module com {
                      * Constructs a new instance of the PurchaseHistoryResponseListener interface with the provided implementation.
                      */
                     public constructor(implementation: {
-                        onPurchaseHistoryResponse(result: Purchase.PurchasesResult): void;
+                        onPurchaseHistoryResponse(responseCode: number,
+                                                  purchasesList: List<Purchase>): void;
                     });
 
-                    public onPurchaseHistoryResponse(result: Purchase.PurchasesResult): void;
+                    public onPurchaseHistoryResponse(responseCode: number,
+                                                     purchasesList: List<Purchase>): void;
                 }
 
                 export class PurchasesUpdatedListener {
@@ -320,10 +322,12 @@ declare module com {
                      * Constructs a new instance of the SkuDetailsResponseListener interface with the provided implementation.
                      */
                     public constructor(implementation: {
-                        onSkuDetailsResponse(result: SkuDetails.SkuDetailsResult): void;
+                        onSkuDetailsResponse(responseCode: number,
+                                             skuDetailsList: List<SkuDetails>): void;
                     });
 
-                    public onSkuDetailsResponse(result: SkuDetails.SkuDetailsResult): void;
+                    public onSkuDetailsResponse(responseCode: number,
+                                                skuDetailsList: List<SkuDetails>): void;
                 }
             }
             export module util {

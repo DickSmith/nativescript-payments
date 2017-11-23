@@ -219,11 +219,12 @@ export function finalizeOrder(order: Order): void {
                                 payload : new Failure(responseCode),
                             });
                         }
+                        const pending: List<Purchase> = _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList();
                         _payments$.next({
                             context : EventContext.PROCESSING_ORDER,
                             result :  EventResult.PENDING,
-                            payload : _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(),
-                        }); // TODO is it safe? elsewhere?
+                            payload : pending ? pending.size() : 0,
+                        });
                     } else {
                         console.error(new Error('BillingClient missing.'));
                     }
@@ -299,11 +300,13 @@ function _purchaseHandler(
     purchases: List<Purchase>,
 ) {
     if ( _billingClient ) {
+        let pending: List<Purchase>;
+        pending = _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList();
         _payments$.next({
             context : EventContext.PROCESSING_ORDER,
             result :  EventResult.PENDING,
-            payload : _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(),
-        });  // TODO is it safe? elsewhere?
+            payload : pending ? pending.size() : 0,
+        });
         if ( responseCode === BillingResponse.OK ) {
             for ( let i = 0; i < purchases.size(); i++ ) {
                 const purchase: Purchase = purchases.get(i);
@@ -322,11 +325,12 @@ function _purchaseHandler(
                 payload : new Failure(responseCode),
             });
         }
+        pending = _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList();
         _payments$.next({
             context : EventContext.PROCESSING_ORDER,
             result :  EventResult.PENDING,
-            payload : _billingClient.queryPurchases(SkuType.INAPP).getPurchasesList().size(),
-        });  // TODO is it safe? elsewhere?
+            payload : pending ? pending.size() : 0,
+        });
     } else {
         console.error(new Error('BillingClient missing.'));
     }
