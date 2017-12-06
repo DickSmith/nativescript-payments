@@ -197,12 +197,12 @@ declare module com {
                      * Constructs a new instance of the ConsumeResponseListener interface with the provided implementation.
                      */
                     public constructor(implementation: {
-                        onConsumeResponse(purchaseToken: string,
-                                          resultCode: number): void;
+                        onConsumeResponse(responseCode: number,
+                                          purchaseToken: string): void;
                     });
 
-                    public onConsumeResponse(purchaseToken: string,
-                                             resultCode: number): void;
+                    public onConsumeResponse(responseCode: number,
+                                             purchaseToken: string): void;
                 }
 
                 export class Purchase {

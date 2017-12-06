@@ -197,7 +197,7 @@ class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTran
         _transactionHandler(queue, transactions);
     }
 
-    public paymentQueueRestoreCompletedTransactionsFinished?(queue: SKPaymentQueue): void {
+    public paymentQueueRestoreCompletedTransactionsFinished(queue: SKPaymentQueue): void {
         _payments$.next({
             context : EventContext.RESTORING_ORDERS,
             result :  EventResult.SUCCESS,
@@ -205,7 +205,7 @@ class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTran
         });
     }
 
-    public paymentQueueRestoreCompletedTransactionsFailedWithError?(
+    public paymentQueueRestoreCompletedTransactionsFailedWithError(
         queue: SKPaymentQueue,
         error: NSError,
     ): void {
@@ -216,7 +216,7 @@ class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTran
         });
     }
 
-    public paymentQueueRemovedTransactions?(
+    public paymentQueueRemovedTransactions(
         queue: SKPaymentQueue,
         transactions: NSArray<SKPaymentTransaction>,
     ): void {
@@ -235,6 +235,23 @@ class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTran
             result :  EventResult.PENDING,
             payload : queue.transactions.count,
         });
+    }
+
+    public paymentQueueShouldAddStorePaymentForProduct(
+        queue: SKPaymentQueue,
+        payment: SKPayment,
+        product: SKProduct
+    ): boolean {
+        console.log('paymentQueueShouldAddStorePaymentForProduct called. Not implemented.');
+
+        return false;
+    }
+
+    public paymentQueueUpdatedDownloads(
+        queue: SKPaymentQueue,
+        downloads: NSArray<SKDownload>
+    ): void {
+        console.log('paymentQueueUpdatedDownloads called. Not implemented.');
     }
 }
 
