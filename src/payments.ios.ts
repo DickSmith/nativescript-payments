@@ -242,9 +242,7 @@ class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTran
         payment: SKPayment,
         product: SKProduct
     ): boolean {
-        console.log('paymentQueueShouldAddStorePaymentForProduct called. Not implemented.');
-
-        return false;
+        return true;
     }
 
     public paymentQueueUpdatedDownloads(
