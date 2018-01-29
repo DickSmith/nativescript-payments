@@ -1,8 +1,11 @@
 import { Failure } from './failure/failure';
 import { Item } from './item/item';
 import { Order } from './order/order';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
+/* tslint:disable: no-import-side-effect */
+import 'rxjs/add/operator/publish';
+/* tslint:enable: no-import-side-effect */
 
 export declare type EventPayload = Failure | Item | Order | Array<Item> | Array<string> | number | null;
 
@@ -27,12 +30,12 @@ export interface IPaymentEvent {
     payload: EventPayload;
 }
 
-export declare const _payments$: Subject<IPaymentEvent>;
-export declare const payments$: Observable<IPaymentEvent>;
+export declare const _payments$: ReplaySubject<IPaymentEvent>;
+export declare const payments$: ConnectableObservable<IPaymentEvent>;
 
-export declare function connect(): void;
+export declare function init(): void;
 
-export declare function disconnect(): void;
+export declare function tearDown(): void;
 
 export declare function fetchItems(itemIds: Array<string>): void;
 

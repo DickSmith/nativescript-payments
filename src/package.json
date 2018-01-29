@@ -1,6 +1,6 @@
 {
   "name": "nativescript-payments",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A NativeScript plugin for in-app payments",
   "main": "payments",
   "typings": "index.d.ts",

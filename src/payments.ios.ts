@@ -16,11 +16,11 @@ export {
     payments$,
 } from './payments.common';
 
-let _productRequest: SKProductsRequest | null;
-let _productRequestDelegate: SKProductRequestDelegateImpl | null;
-let _paymentTransactionObserver: SKPaymentTransactionObserverImpl | null;
+export let _productRequest: SKProductsRequest | null;
+export let _productRequestDelegate: SKProductRequestDelegateImpl | null;
+export let _paymentTransactionObserver: SKPaymentTransactionObserverImpl | null;
 
-export function connect(): void {
+export function init(): void {
     if ( !_paymentTransactionObserver ) {
         _payments$.next({
             context : EventContext.CONNECTING_STORE,
@@ -30,23 +30,31 @@ export function connect(): void {
         /* tslint:disable: no-use-before-declare */
         _paymentTransactionObserver = new SKPaymentTransactionObserverImpl();
         /* tslint:enable: no-use-before-declare */
-        // Handle transactions already in queue
-        _transactionHandler(SKPaymentQueue.defaultQueue(), SKPaymentQueue.defaultQueue().transactions);
         _payments$.next({
             context : EventContext.CONNECTING_STORE,
             result :  EventResult.PENDING,
             payload : null,
         });
-        SKPaymentQueue.defaultQueue().addTransactionObserver(_paymentTransactionObserver);
-        _payments$.next({
-            context : EventContext.CONNECTING_STORE,
-            result :  EventResult.SUCCESS,
-            payload : null,
-        });
+        try {
+            SKPaymentQueue.defaultQueue().addTransactionObserver(_paymentTransactionObserver);
+            _payments$.next({
+                context : EventContext.CONNECTING_STORE,
+                result :  EventResult.SUCCESS,
+                payload : null,
+            });
+        } catch (e) {
+            const errorPayload = typeof e === 'object' ? e.message : e;
+            console.error(new Error(`Init failed: ${errorPayload}`));
+            _payments$.next({
+                context : EventContext.CONNECTING_STORE,
+                result :  EventResult.FAILURE,
+                payload : null,
+            });
+        }
     }
 }
 
-export function disconnect(): void {
+export function tearDown(): void {
     if ( _paymentTransactionObserver ) {
         SKPaymentQueue.defaultQueue().removeTransactionObserver(_paymentTransactionObserver);
     }
@@ -78,29 +86,43 @@ export function buyItem(
     item: Item,
     userData?: string,
 ): void {
-    const pendingCount = SKPaymentQueue.defaultQueue().transactions.count;
-    if ( !pendingCount ) {
-        _payments$.next({
-            context : EventContext.PROCESSING_ORDER,
-            result :  EventResult.PENDING,
-            payload : pendingCount + 1,
-        });
-        const payment = SKMutablePayment.paymentWithProduct(<SKProduct>item.nativeValue);
-        if ( userData ) {
-            payment.applicationUsername = userData;
+    if (SKPaymentQueue.defaultQueue().transactions) {
+        const pendingCount = SKPaymentQueue.defaultQueue().transactions.count;
+        if ( !pendingCount ) {
+            _payments$.next({
+                context : EventContext.PROCESSING_ORDER,
+                result :  EventResult.PENDING,
+                payload : pendingCount + 1,
+            });
+            const payment = SKMutablePayment.paymentWithProduct(<SKProduct>item.nativeValue);
+            if ( userData ) {
+                payment.applicationUsername = userData;
+            }
+            try {
+                SKPaymentQueue.defaultQueue().addPayment(payment);
+                _payments$.next({
+                    context : EventContext.PROCESSING_ORDER,
+                    result :  EventResult.STARTED,
+                    payload : item,
+                });
+            } catch (e) {
+                const errorPayload = typeof e === 'object' ? e.message : e;
+                console.error(new Error(`Error while adding payment: ${errorPayload}`));
+                _payments$.next({
+                    context : EventContext.PROCESSING_ORDER,
+                    result :  EventResult.FAILURE,
+                    payload : null,
+                });
+            }
+        } else {
+            _payments$.next({
+                context : EventContext.PROCESSING_ORDER,
+                result :  EventResult.PENDING,
+                payload : pendingCount,
+            });
         }
-        SKPaymentQueue.defaultQueue().addPayment(payment);
-        _payments$.next({
-            context : EventContext.PROCESSING_ORDER,
-            result :  EventResult.STARTED,
-            payload : item,
-        });
     } else {
-        _payments$.next({
-            context : EventContext.PROCESSING_ORDER,
-            result :  EventResult.PENDING,
-            payload : pendingCount,
-        });
+        console.error(new Error('SKPaymentQueue.defaultQueue().transactions missing.'));
     }
 }
 
@@ -111,12 +133,22 @@ export function finalizeOrder(order: Order): void {
         payload : order,
     });
     if ( order.state === OrderState.VALID && !order.restored ) {
-        SKPaymentQueue.defaultQueue().finishTransaction(<SKPaymentTransaction>order.nativeValue);
-        _payments$.next({
-            context : EventContext.FINALIZING_ORDER,
-            result :  EventResult.PENDING,
-            payload : order,
-        });
+        try {
+            SKPaymentQueue.defaultQueue().finishTransaction(<SKPaymentTransaction>order.nativeValue);
+            _payments$.next({
+                context : EventContext.FINALIZING_ORDER,
+                result :  EventResult.PENDING,
+                payload : order,
+            });
+        } catch (e) {
+            const errorPayload = typeof e === 'object' ? e.message : e;
+            console.error(new Error(`Error while finalizing order: ${errorPayload}`));
+            _payments$.next({
+                context : EventContext.FINALIZING_ORDER,
+                result :  EventResult.FAILURE,
+                payload : null,
+            });
+        }
     } else {
         _payments$.next({
             context : EventContext.FINALIZING_ORDER,
@@ -132,7 +164,17 @@ export function restoreOrders(): void {
         result :  EventResult.STARTED,
         payload : null,
     });
-    SKPaymentQueue.defaultQueue().restoreCompletedTransactions();
+    try {
+        SKPaymentQueue.defaultQueue().restoreCompletedTransactions();
+    } catch (e) {
+        const errorPayload = typeof e === 'object' ? e.message : e;
+        console.error(new Error(`Error while finalizing order: ${errorPayload}`));
+        _payments$.next({
+            context : EventContext.RESTORING_ORDERS,
+            result :  EventResult.FAILURE,
+            payload : null,
+        });
+    }
 }
 
 export function canMakePayments(): boolean { // TODO ?
@@ -140,7 +182,7 @@ export function canMakePayments(): boolean { // TODO ?
 }
 
 /* tslint:disable: max-classes-per-file */
-class SKProductRequestDelegateImpl extends NSObject implements SKProductsRequestDelegate {
+export class SKProductRequestDelegateImpl extends NSObject implements SKProductsRequestDelegate {
     /* tslint:disable: variable-name */
     public static ObjCProtocols = [SKProductsRequestDelegate];
 
@@ -184,7 +226,7 @@ class SKProductRequestDelegateImpl extends NSObject implements SKProductsRequest
     }
 }
 
-class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTransactionObserver {
+export class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTransactionObserver {
     /* tslint:disable: variable-name */
     public static ObjCProtocols = [SKPaymentTransactionObserver];
 
@@ -220,20 +262,22 @@ class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTran
         queue: SKPaymentQueue,
         transactions: NSArray<SKPaymentTransaction>,
     ): void {
-        for ( let i = 0; i < transactions.count; i++ ) {
-            const transaction: SKPaymentTransaction = transactions.objectAtIndex(i);
-            if ( transaction.transactionState === SKPaymentTransactionState.Purchased ) {
-                _payments$.next({
-                    context : EventContext.FINALIZING_ORDER,
-                    result :  EventResult.SUCCESS,
-                    payload : new Order(transaction),
-                });
+        if (transactions && transactions.count) {
+            for ( let i = 0; i < transactions.count; i++ ) {
+                const transaction: SKPaymentTransaction = transactions.objectAtIndex(i);
+                if ( transaction.transactionState === SKPaymentTransactionState.Purchased ) {
+                    _payments$.next({
+                        context : EventContext.FINALIZING_ORDER,
+                        result :  EventResult.SUCCESS,
+                        payload : new Order(transaction),
+                    });
+                }
             }
         }
         _payments$.next({
             context : EventContext.PROCESSING_ORDER,
             result :  EventResult.PENDING,
-            payload : queue.transactions.count,
+            payload : queue.transactions ? queue.transactions.count : 0,
         });
     }
 
@@ -253,59 +297,61 @@ class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTran
     }
 }
 
-function _transactionHandler(
+export function _transactionHandler(
     queue: SKPaymentQueue,
     transactions: NSArray<SKPaymentTransaction>,
 ): void {
     _payments$.next({
         context : EventContext.PROCESSING_ORDER,
         result :  EventResult.PENDING,
-        payload : queue.transactions.count,
+        payload : queue.transactions ? queue.transactions.count : 0,
     });
-    for ( let i = 0; i < transactions.count; i++ ) {
-        const transaction: SKPaymentTransaction = transactions.objectAtIndex(i);
+    if (transactions && transactions.count) {
+        for ( let i = 0; i < transactions.count; i++ ) {
+            const transaction: SKPaymentTransaction = transactions.objectAtIndex(i);
 
-        switch ( transaction.transactionState ) {
-            case SKPaymentTransactionState.Purchased:
-                _payments$.next({
-                    context : EventContext.PROCESSING_ORDER,
-                    result :  EventResult.SUCCESS,
-                    payload : new Order(transaction),
-                });
-                break;
-            case SKPaymentTransactionState.Failed:
-                _payments$.next({
-                    context : EventContext.PROCESSING_ORDER,
-                    result :  EventResult.FAILURE,
-                    payload : new Failure(transaction.error.code),
-                });
-                queue.finishTransaction(transaction);
-                break;
-            case SKPaymentTransactionState.Restored:
-                _payments$.next({
-                    context : EventContext.PROCESSING_ORDER,
-                    result :  EventResult.SUCCESS,
-                    payload : new Order(transaction.originalTransaction, true),
-                });
-                _payments$.next({
-                    context : EventContext.RESTORING_ORDERS,
-                    result :  EventResult.PENDING,
-                    payload : new Order(transaction.originalTransaction, true),
-                });
-                queue.finishTransaction(transaction);
-                break;
-            case SKPaymentTransactionState.Purchasing:
-            case SKPaymentTransactionState.Deferred: // TODO ?
-                break;
-            default:
-                console.error(new Error('Missing or unknown transaction state.'));
-                break;
+            switch ( transaction.transactionState ) {
+                case SKPaymentTransactionState.Purchased:
+                    _payments$.next({
+                        context : EventContext.PROCESSING_ORDER,
+                        result :  EventResult.SUCCESS,
+                        payload : new Order(transaction),
+                    });
+                    break;
+                case SKPaymentTransactionState.Failed:
+                    _payments$.next({
+                        context : EventContext.PROCESSING_ORDER,
+                        result :  EventResult.FAILURE,
+                        payload : new Failure(transaction.error.code),
+                    });
+                    queue.finishTransaction(transaction);
+                    break;
+                case SKPaymentTransactionState.Restored:
+                    _payments$.next({
+                        context : EventContext.PROCESSING_ORDER,
+                        result :  EventResult.SUCCESS,
+                        payload : new Order(transaction.originalTransaction, true),
+                    });
+                    _payments$.next({
+                        context : EventContext.RESTORING_ORDERS,
+                        result :  EventResult.PENDING,
+                        payload : new Order(transaction.originalTransaction, true),
+                    });
+                    queue.finishTransaction(transaction);
+                    break;
+                case SKPaymentTransactionState.Purchasing:
+                case SKPaymentTransactionState.Deferred: // TODO ?
+                    break;
+                default:
+                    console.error(new Error('Missing or unknown transaction state.'));
+                    break;
+            }
         }
     }
     _payments$.next({
         context : EventContext.PROCESSING_ORDER,
         result :  EventResult.PENDING,
-        payload : queue.transactions.count,
+        payload : queue.transactions ? queue.transactions.count : 0,
     });
 }
 

@@ -36,9 +36,9 @@ export {
     payments$,
 } from './payments.common';
 
-let _billingClient: BillingClient | null;
+export let _billingClient: BillingClient | null;
 
-export function connect(): void {
+export function init(): void {
     if ( !_billingClient ) {
         _payments$.next({
             context : EventContext.CONNECTING_STORE,
@@ -74,7 +74,7 @@ export function connect(): void {
                                 payload : null,
                             });
                         } else {
-                            console.error(new Error('Connection failed with code: ' + resultCode));
+                            console.error(new Error('Init failed with code: ' + resultCode));
                             _payments$.next({
                                 context : EventContext.CONNECTING_STORE,
                                 result :  EventResult.FAILURE,
@@ -96,7 +96,7 @@ export function connect(): void {
     }
 }
 
-export function disconnect() {
+export function tearDown() {
     if ( _billingClient ) {
         _billingClient.endConnection();
     }
@@ -295,7 +295,7 @@ export function canMakePayments(/*types*/): boolean {
     return true; // TODO isReady?
 }
 
-function _purchaseHandler(
+export function _purchaseHandler(
     responseCode: number,
     purchases: List<Purchase>,
 ) {
@@ -308,14 +308,16 @@ function _purchaseHandler(
             payload : pending ? pending.size() : 0,
         });
         if ( responseCode === BillingResponse.OK ) {
-            for ( let i = 0; i < purchases.size(); i++ ) {
-                const purchase: Purchase = purchases.get(i);
-                if ( purchase ) {
-                    _payments$.next({
-                        context : EventContext.PROCESSING_ORDER,
-                        result :  EventResult.SUCCESS,
-                        payload : new Order(purchase),
-                    });
+            if (purchases && purchases.size()) {
+                for ( let i = 0; i < purchases.size(); i++ ) {
+                    const purchase: Purchase = purchases.get(i);
+                    if ( purchase ) {
+                        _payments$.next({
+                            context : EventContext.PROCESSING_ORDER,
+                            result :  EventResult.SUCCESS,
+                            payload : new Order(purchase),
+                        });
+                    }
                 }
             }
         } else {
