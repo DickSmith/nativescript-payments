@@ -27,7 +27,8 @@
     "nuke": "rm -rf node_modules/ package-lock.json",
     "nuki": "npm run nuke && npm i",
     "build": "npm run lint && tsc",
-    "prepack": "npm run build"
+    "prepack": "npm run build && cp ../LICENSE ./LICENSE",
+    "postpack": "rm ./LICENSE"
   },
   "repository": {
     "type": "git",
