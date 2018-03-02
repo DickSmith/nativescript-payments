@@ -29,12 +29,13 @@ export class Order extends BaseOrder {
                 break;
         }
 
-        this.itemId = nativeValue.payment.productIdentifier;
+        this.itemId = nativeValue.payment ? nativeValue.payment.productIdentifier : 'undefined';
         this.orderId = nativeValue.transactionIdentifier;
         this.orderDate = nativeValue.transactionDate;
         this.receiptToken = nativeValue.transactionReceipt
-                                       .base64EncodedStringWithOptions(NSDataBase64EncodingOptions.Encoding64CharacterLineLength);
-        this.userData = nativeValue.payment.applicationUsername;
+            ? nativeValue.transactionReceipt.base64EncodedStringWithOptions(NSDataBase64EncodingOptions.Encoding64CharacterLineLength)
+            : 'undefined';
+        this.userData = nativeValue.payment ? nativeValue.payment.applicationUsername : 'undefined';
 
     }
 

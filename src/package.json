@@ -1,14 +1,14 @@
 {
   "name": "nativescript-payments",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A NativeScript plugin for in-app payments",
   "main": "payments",
   "typings": "index.d.ts",
   "nativescript": {
     "category": "Utilities",
     "platforms": {
-      "ios": "3.3.0",
-      "android": "3.3.1"
+      "ios": "3.4.1",
+      "android": "3.4.1"
     }
   },
   "scripts": {
@@ -23,7 +23,7 @@
     "demo.android": "npm i && npm run tsc && cd ../demo && tns run android --syncAllFiles",
     "clean": "rm -rf node_modules && cd ../demo && rm -rf hooks node_modules platforms && cd ../src && npm run plugin.link",
     "tns": "tns",
-    "lint": "tslint --type-check --force --fix --project tsconfig.json",
+    "lint": "tslint --force --fix --project tsconfig.json",
     "nuke": "rm -rf node_modules/ package-lock.json",
     "nuki": "npm run nuke && npm i",
     "build": "npm run lint && tsc",
@@ -58,15 +58,15 @@
   "readmeFilename": "README.md",
   "peerDependencies": {
     "rxjs": "^5.0.0",
-    "tns-core-modules": ">=3.1.0"
+    "tns-core-modules": ">=3.4.0"
   },
   "devDependencies": {
     "prompt": "^1.0.0",
     "rimraf": "^2.5.0",
     "rxjs": "^5.0.0",
-    "tns-core-modules": "~3.3.0",
-    "tns-platform-declarations": "~3.3.0",
-    "tslint": "~5.8.0",
+    "tns-core-modules": "~3.4.0",
+    "tns-platform-declarations": "~3.4.0",
+    "tslint": "~5.9.1",
     "typescript": "~2.6.2"
   },
   "dependencies": {},

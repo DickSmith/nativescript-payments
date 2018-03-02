@@ -1,6 +1,6 @@
-import { Failure } from './failure/failure';
-import { Item } from './item/item';
-import { Order } from './order/order';
+import { Failure } from './failure';
+import { Item } from './item';
+import { Order } from './order';
 import { OrderState } from './order/order.common';
 import {
     _payments$,
@@ -16,9 +16,9 @@ export {
     payments$,
 } from './payments.common';
 
-export let _productRequest: SKProductsRequest | null;
-export let _productRequestDelegate: SKProductRequestDelegateImpl | null;
-export let _paymentTransactionObserver: SKPaymentTransactionObserverImpl | null;
+let _productRequest: SKProductsRequest | null;
+let _productRequestDelegate: SKProductRequestDelegateImpl | null;
+let _paymentTransactionObserver: SKPaymentTransactionObserverImpl | null;
 
 export function init(): void {
     if ( !_paymentTransactionObserver ) {
@@ -168,7 +168,7 @@ export function restoreOrders(): void {
         SKPaymentQueue.defaultQueue().restoreCompletedTransactions();
     } catch (e) {
         const errorPayload = typeof e === 'object' ? e.message : e;
-        console.error(new Error(`Error while finalizing order: ${errorPayload}`));
+        console.error(new Error(`Error while restoring order: ${errorPayload}`));
         _payments$.next({
             context : EventContext.RESTORING_ORDERS,
             result :  EventResult.FAILURE,
@@ -182,7 +182,7 @@ export function canMakePayments(): boolean { // TODO ?
 }
 
 /* tslint:disable: max-classes-per-file */
-export class SKProductRequestDelegateImpl extends NSObject implements SKProductsRequestDelegate {
+class SKProductRequestDelegateImpl extends NSObject implements SKProductsRequestDelegate {
     /* tslint:disable: variable-name */
     public static ObjCProtocols = [SKProductsRequestDelegate];
 
@@ -226,7 +226,7 @@ export class SKProductRequestDelegateImpl extends NSObject implements SKProducts
     }
 }
 
-export class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTransactionObserver {
+class SKPaymentTransactionObserverImpl extends NSObject implements SKPaymentTransactionObserver {
     /* tslint:disable: variable-name */
     public static ObjCProtocols = [SKPaymentTransactionObserver];
 
@@ -297,7 +297,7 @@ export class SKPaymentTransactionObserverImpl extends NSObject implements SKPaym
     }
 }
 
-export function _transactionHandler(
+function _transactionHandler(
     queue: SKPaymentQueue,
     transactions: NSArray<SKPaymentTransaction>,
 ): void {
@@ -324,7 +324,12 @@ export function _transactionHandler(
                         result :  EventResult.FAILURE,
                         payload : new Failure(transaction.error.code),
                     });
-                    queue.finishTransaction(transaction);
+                    try {
+                        queue.finishTransaction(transaction);
+                    } catch (e) {
+                        const errorPayload = typeof e === 'object' ? e.message : e;
+                        console.error(new Error(`Error while finalizing failed order: ${errorPayload}`));
+                    }
                     break;
                 case SKPaymentTransactionState.Restored:
                     _payments$.next({
@@ -337,7 +342,12 @@ export function _transactionHandler(
                         result :  EventResult.PENDING,
                         payload : new Order(transaction.originalTransaction, true),
                     });
-                    queue.finishTransaction(transaction);
+                    try {
+                        queue.finishTransaction(transaction);
+                    } catch (e) {
+                        const errorPayload = typeof e === 'object' ? e.message : e;
+                        console.error(new Error(`Error while finalizing restored order: ${errorPayload}`));
+                    }
                     break;
                 case SKPaymentTransactionState.Purchasing:
                 case SKPaymentTransactionState.Deferred: // TODO ?

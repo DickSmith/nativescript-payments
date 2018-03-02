@@ -1,4 +1,4 @@
-import SkuDetails = com.android.billingclient.api.SkuDetails;
+export type SkuDetails = com.android.billingclient.api.SkuDetails;
 
 export abstract class BaseItem {
     public abstract nativeValue: SkuDetails | SKProduct;
