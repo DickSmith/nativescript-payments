@@ -11,8 +11,9 @@ export class Order extends BaseOrder {
         nativeValue: Purchase,
         restored: boolean = false,
     ) {
-        const jsonObject: any = JSON.parse(nativeValue.getOriginalJson());
         super(nativeValue, restored);
+
+        const jsonObject: any = JSON.parse(nativeValue.getOriginalJson());
         switch ( jsonObject.purchaseState ) { // number or "number"?
             case 0: // Purchased
                 this.state = OrderState.VALID;

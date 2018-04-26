@@ -27,7 +27,8 @@
     "strict": true,
     "alwaysStrict": true,
     "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false // TODO
   },
   "include": [
     // references

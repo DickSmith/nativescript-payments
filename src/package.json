@@ -1,6 +1,6 @@
 {
   "name": "nativescript-payments",
-  "version": "0.0.10",
+  "version": "0.1.0",
   "description": "A NativeScript plugin for in-app payments",
   "main": "payments",
   "typings": "index.d.ts",
@@ -27,8 +27,8 @@
     "nuke": "rm -rf node_modules/ package-lock.json",
     "nuki": "npm run nuke && npm i",
     "build": "npm run lint && tsc",
-    "prepack": "npm run build && cp ../LICENSE ./LICENSE",
-    "postpack": "rm ./LICENSE"
+    "prepack": "npm run build && cp ../LICENSE ./LICENSE && cp ../README.md ./README.md",
+    "postpack": "rm ./LICENSE ./README.md"
   },
   "repository": {
     "type": "git",
@@ -58,18 +58,18 @@
   "homepage": "https://github.com/DickSmith/nativescript-payments",
   "readmeFilename": "README.md",
   "peerDependencies": {
-    "rxjs": "^5.0.0",
     "tns-core-modules": ">=3.4.0"
   },
   "devDependencies": {
     "prompt": "^1.0.0",
     "rimraf": "^2.5.0",
-    "rxjs": "^5.0.0",
-    "tns-core-modules": "~3.4.0",
-    "tns-platform-declarations": "~3.4.0",
+    "tns-core-modules": "~4.0.0",
+    "tns-platform-declarations": "~4.0.0",
     "tslint": "~5.9.1",
-    "typescript": "~2.6.2"
+    "typescript": "~2.8.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "rxjs": "^6.0.0"
+  },
   "bootstrapper": "nativescript-plugin-seed"
 }

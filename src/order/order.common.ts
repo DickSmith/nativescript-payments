@@ -1,7 +1,7 @@
 export type Purchase = com.android.billingclient.api.Purchase;
 
 export abstract class BaseOrder {
-    public abstract nativeValue: Purchase | SKPaymentTransaction;
+    public nativeValue: Purchase | SKPaymentTransaction;
     public abstract readonly debug: string | null;
 
     public state: OrderState;

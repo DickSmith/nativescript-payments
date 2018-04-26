@@ -27,27 +27,28 @@ declare module com {
                 }
 
                 export abstract class BillingClient {
-                    public isReady(): boolean;
-
-                    public querySkuDetailsAsync(skuType: string,
-                                                skuList: List<string>,
-                                                listener: SkuDetailsResponseListener): void;
-
-                    public queryPurchases(skuType: string): Purchase.PurchasesResult;
-
-                    public startConnection(listener: BillingClientStateListener): void;
+                    public isFeatureSupported(feature: string): number;
 
                     public endConnection(): void;
 
                     public constructor();
 
-                    public isFeatureSupported(feature: string): number;
+                    public launchBillingFlow(activity: Activity,
+                                             params: BillingFlowParams): number;
+
+                    public querySkuDetailsAsync(params: SkuDetailsParams,
+                                                listener: SkuDetailsResponseListener): void;
 
                     public consumeAsync(purchaseToken: string,
                                         listener: ConsumeResponseListener): void;
 
-                    public launchBillingFlow(activity: Activity,
-                                             params: BillingFlowParams): number;
+                    public queryPurchases(skuType: string): Purchase.PurchasesResult;
+
+                    public isReady(): boolean;
+
+                    public static newBuilder(context: Context): BillingClient.Builder;
+
+                    public startConnection(listener: BillingClientStateListener): void;
 
                     public queryPurchaseHistoryAsync(skuType: string,
                                                      listener: PurchaseHistoryResponseListener): void;
@@ -74,11 +75,9 @@ declare module com {
                     }
 
                     export class Builder {
-                        public build(): BillingClient;
-
                         public setListener(listener: PurchasesUpdatedListener): BillingClient.Builder;
 
-                        public constructor(context: Context);
+                        public build(): BillingClient;
                     }
 
                     export class FeatureType {
@@ -114,10 +113,10 @@ declare module com {
                     public queryPurchases(skuType: string): Purchase.PurchasesResult;
 
                     public startConnection(listener: BillingClientStateListener): void;
+                    public isFeatureSupported(param0: string): number;
 
                     public endConnection(): void;
 
-                    public isFeatureSupported(feature: string): number;
 
                     public consumeAsync(param0: string,
                                         param1: ConsumeResponseListener): void;
@@ -153,21 +152,23 @@ declare module com {
                 }
 
                 export class BillingFlowParams {
-                    public getVrPurchaseFlow(): boolean;
+                    public getReplaceSkusProration(): boolean;
 
-                    public constructor();
+                    public getVrPurchaseFlow(): boolean;
 
                     public getSku(): string;
 
+                    public constructor();
+
+                    public static newBuilder(): BillingFlowParams.Builder;
+
                     public getOldSkus(): ArrayList<string>;
+                    public getSkuType(): string;
 
                     public getAccountId(): string;
 
-                    public getReplaceSkusProration(): boolean;
-
                     public hasExtraParams(): boolean;
 
-                    public getSkuType(): string;
                 }
 
                 export module BillingFlowParams {

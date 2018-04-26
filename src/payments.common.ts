@@ -1,11 +1,8 @@
-import { Failure } from './failure/failure';
-import { Item } from './item/item';
-import { Order } from './order/order';
-import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-/* tslint:disable: no-import-side-effect */
-import 'rxjs/add/operator/publish';
-/* tslint:enable: no-import-side-effect */
+import { Failure } from './failure';
+import { Item } from './item';
+import { Order } from './order';
+import { ConnectableObservable, ReplaySubject } from 'rxjs';
+import { publish } from 'rxjs/operators';
 
 export type EventPayload = Failure | Item | Order | Array<Item> | Array<string> | number | null;
 
@@ -30,8 +27,9 @@ export interface IPaymentEvent {
     payload: EventPayload;
 }
 
+// TODO publishReplay and regular Subject instead?
 export const _payments$: ReplaySubject<IPaymentEvent> = new ReplaySubject<IPaymentEvent>(128);
-export const payments$: ConnectableObservable<IPaymentEvent> = _payments$.publish();
+export const payments$: ConnectableObservable<IPaymentEvent> = <ConnectableObservable<IPaymentEvent>>_payments$.pipe(publish());
 
 // const _storeConnecting$: Subject<any> = new Subject<any>();
 // const _itemsRetrieving$: Subject<any> = new Subject<any>();

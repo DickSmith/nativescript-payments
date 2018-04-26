@@ -37,7 +37,6 @@
     "forin": true,
     "import-blacklist": [
       true,
-      "rxjs",
       "nativescript-angular"
     ],
     "import-spacing": true,

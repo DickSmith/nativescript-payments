@@ -3,15 +3,11 @@
 [![npm](https://img.shields.io/npm/v/nativescript-paymentssvg)](https://www.npmjs.com/package/nativescript-payments)
 [![npm](https://img.shields.io/npm/dt/nativescript-payments.svg?label=npm%20downloads)](https://www.npmjs.com/package/nativescript-payments)
 
-For payments via Google Play or iTunes.
-
-## (Optional) Prerequisites / Requirements
-
-* RxJS 5.x
+For payments via Google Play or iTunes utilizing RxJS.
 
 ## Installation
 
-```javascript
+```bash
 tns plugin add nativescript-payments
 ```
 

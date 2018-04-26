@@ -1,7 +1,7 @@
 export type SkuDetails = com.android.billingclient.api.SkuDetails;
 
 export abstract class BaseItem {
-    public abstract nativeValue: SkuDetails | SKProduct;
+    public nativeValue: SkuDetails | SKProduct;
     public abstract readonly debug: string | null;
 
     public itemId: string;
