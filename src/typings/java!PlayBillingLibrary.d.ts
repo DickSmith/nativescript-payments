@@ -1,5 +1,4 @@
-/* tslint:disable:no-unused-variable no-internal-module no-namespace max-classes-per-file ban-types */
-/* tslint:disable indent max-line-length member-ordering unified-signatures member-access semicolon trailing-comma */
+/* tslint:disable */
 
 declare module com {
   export module android {
@@ -14,7 +13,13 @@ declare module com {
 
         public constructor();
       }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
       export module api {
         export class BillingBroadcastManager {
         }
@@ -22,29 +27,41 @@ declare module com {
         export module BillingBroadcastManager {
           export class BillingBroadcastReceiver {
             public onReceive(context: Context, intent: Intent): void;
+
+            public unRegister(param0: Context): void;
+
+            public register(param0: Context, param1: IntentFilter): void;
           }
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export abstract class BillingClient {
-          public isFeatureSupported(feature: string): number;
+          public isReady(): boolean;
+
+          public queryPurchases(skuType: string): Purchase.PurchasesResult;
+
+          public static newBuilder(context: Context): BillingClient.Builder;
+
+          public startConnection(listener: BillingClientStateListener): void;
 
           public endConnection(): void;
 
           public constructor();
 
-          public launchBillingFlow(activity: Activity, params: BillingFlowParams): number;
+          public isFeatureSupported(feature: string): number;
 
           public querySkuDetailsAsync(params: SkuDetailsParams, listener: SkuDetailsResponseListener): void;
 
           public consumeAsync(purchaseToken: string, listener: ConsumeResponseListener): void;
 
-          public queryPurchases(skuType: string): Purchase.PurchasesResult;
-
-          public isReady(): boolean;
-
-          public static newBuilder(context: Context): BillingClient.Builder;
-
-          public startConnection(listener: BillingClientStateListener): void;
+          public launchBillingFlow(activity: Activity, params: BillingFlowParams): number;
 
           public queryPurchaseHistoryAsync(skuType: string, listener: PurchaseHistoryResponseListener): void;
         }
@@ -70,9 +87,9 @@ declare module com {
           }
 
           export class Builder {
-            public setListener(listener: PurchasesUpdatedListener): BillingClient.Builder;
-
             public build(): BillingClient;
+
+            public setListener(listener: PurchasesUpdatedListener): BillingClient.Builder;
           }
 
           export class FeatureType {
@@ -97,26 +114,34 @@ declare module com {
             public static SUBS: string;
           }
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class BillingClientImpl extends BillingClient {
           public isReady(): boolean;
 
-          public querySkuDetailsAsync(skuType: string, skuList: List<string>, listener: SkuDetailsResponseListener): void;
 
           public queryPurchases(skuType: string): Purchase.PurchasesResult;
 
           public startConnection(listener: BillingClientStateListener): void;
 
-          public isFeatureSupported(param0: string): number;
-
           public endConnection(): void;
 
+          public isFeatureSupported(feature: string): number;
 
-          public consumeAsync(param0: string, param1: ConsumeResponseListener): void;
+          public querySkuDetailsAsync(params: SkuDetailsParams, listener: SkuDetailsResponseListener): void;
+
+          public consumeAsync(purchaseToken: string, listener: ConsumeResponseListener): void;
 
           public launchBillingFlow(activity: Activity, params: BillingFlowParams): number;
 
-          public queryPurchaseHistoryAsync(param0: string, param1: PurchaseHistoryResponseListener): void;
+          public queryPurchaseHistoryAsync(skuType: string, listener: PurchaseHistoryResponseListener): void;
         }
 
         export module BillingClientImpl {
@@ -125,8 +150,28 @@ declare module com {
 
             public onServiceDisconnected(param0: ComponentName): void;
           }
-        }
 
+          export class ClientState {
+            /**
+             * Constructs a new instance of the BillingClientImpl$ClientState interface with the provided implementation.
+             */
+            public constructor(implementation: {});
+
+            public static CONNECTED: number;
+            public static DISCONNECTED: number;
+            public static CLOSED: number;
+            public static CONNECTING: number;
+          }
+        }
+      }
+    }
+  }
+}
+
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class BillingClientStateListener {
           /**
            * Constructs a new instance of the BillingClientStateListener interface with the provided implementation.
@@ -139,35 +184,44 @@ declare module com {
 
           public onBillingSetupFinished(resultCode: number): void;
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class BillingFlowParams {
-          public getReplaceSkusProration(): boolean;
-
           public getVrPurchaseFlow(): boolean;
-
-          public getSku(): string;
 
           public constructor();
 
-          public static newBuilder(): BillingFlowParams.Builder;
+          public getReplaceSkusProrationMode(): number;
+
+          public getSku(): string;
+
+          public getOldSku(): string;
 
           public getOldSkus(): ArrayList<string>;
 
-          public getSkuType(): string;
-
           public getAccountId(): string;
+
+          public static newBuilder(): BillingFlowParams.Builder;
 
           public hasExtraParams(): boolean;
 
+          public getSkuType(): string;
         }
 
         export module BillingFlowParams {
           export class Builder {
-            public constructor();
-
             public setVrPurchaseFlow(isVrPurchaseFlow: boolean): BillingFlowParams.Builder;
 
             public setAccountId(accountId: string): BillingFlowParams.Builder;
+
+            public setReplaceSkusProrationMode(replaceSkusProrationMode: number): BillingFlowParams.Builder;
 
             public build(): BillingFlowParams;
 
@@ -177,12 +231,32 @@ declare module com {
 
             public addOldSku(oldSku: string): BillingFlowParams.Builder;
 
-            public setReplaceSkusProration(bReplaceSkusProration: boolean): BillingFlowParams.Builder;
-
             public setSku(sku: string): BillingFlowParams.Builder;
+
+            public setOldSku(oldSku: string): BillingFlowParams.Builder;
+          }
+
+          export class ProrationMode {
+            /**
+             * Constructs a new instance of the BillingFlowParams$ProrationMode interface with the provided implementation.
+             */
+            public constructor(implementation: {});
+
+            public static IMMEDIATE_WITH_TIME_PRORATION: number;
+            public static UNKNOWN_SUBSCRIPTION_UPGRADE_DOWNGRADE_POLICY: number;
+            public static IMMEDIATE_AND_CHARGE_PRORATED_PRICE: number;
+            public static IMMEDIATE_WITHOUT_PRORATION: number;
           }
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class ConsumeResponseListener {
           /**
            * Constructs a new instance of the ConsumeResponseListener interface with the provided implementation.
@@ -193,23 +267,56 @@ declare module com {
 
           public onConsumeResponse(responseCode: number, purchaseToken: string): void;
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
+        export class LocalBroadcastManager {
+          public static getInstance(param0: Context): LocalBroadcastManager;
+
+          public unregisterReceiver(param0: BroadcastReceiver): void;
+
+          public sendBroadcastSync(param0: Intent): void;
+
+          public sendBroadcast(param0: Intent): boolean;
+
+          public registerReceiver(param0: BroadcastReceiver, param1: IntentFilter): void;
+        }
+
+        export module LocalBroadcastManager {
+          export class BroadcastRecord {
+          }
+
+          export class ReceiverRecord {
+            public toString(): string;
+          }
+        }
+      }
+    }
+  }
+}
+
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class Purchase {
+          public constructor(param0: string, param1: string);
+
           public getOrderId(): string;
-
-          public getPurchaseState(): number;
-
-          public equals(o: Object): boolean;
-
-          public getPackageName(): string;
-
-          public getPurchaseToken(): string;
-
-          public constructor(jsonPurchaseInfo: string, signature: string);
 
           public toString(): string;
 
           public getSignature(): string;
+
+          public equals(param0: java.lang.Object): boolean;
+
+          public getPackageName(): string;
 
           public getPurchaseTime(): number;
 
@@ -220,29 +327,26 @@ declare module com {
           public isAutoRenewing(): boolean;
 
           public hashCode(): number;
+
+          public getPurchaseToken(): string;
         }
 
         export module Purchase {
-          export class PurchaseState {
-            /**
-             * Constructs a new instance of the Purchase$PurchaseState interface with the provided implementation.
-             */
-            public constructor(implementation: {});
-
-            public static PURCHASED: number;
-            public static REFUNDED: number;
-            public static CANCELED: number;
-          }
-
           export class PurchasesResult {
-            public constructor(param0: List, param1: number);
-
             public getResponseCode(): number;
 
             public getPurchasesList(): List<Purchase>;
           }
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class PurchaseHistoryResponseListener {
           /**
            * Constructs a new instance of the PurchaseHistoryResponseListener interface with the provided implementation.
@@ -253,7 +357,15 @@ declare module com {
 
           public onPurchaseHistoryResponse(responseCode: number, purchasesList: List<Purchase>): void;
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class PurchasesUpdatedListener {
           /**
            * Constructs a new instance of the PurchasesUpdatedListener interface with the provided implementation.
@@ -264,21 +376,39 @@ declare module com {
 
           public onPurchasesUpdated(responseCode: number, purchases: List<Purchase>): void;
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class SkuDetails {
           public getTitle(): string;
 
-          public toString(): string;
+          public getIntroductoryPriceCycles(): string;
 
           public constructor(param0: string);
 
-          public equals(param0: Object): boolean;
+          public equals(param0: java.lang.Object): boolean;
+
+          public getIntroductoryPriceAmountMicros(): string;
+
+          public getPriceCurrencyCode(): string;
+
+          public toString(): string;
+
+          public getSubscriptionPeriod(): string;
+
+          public getIntroductoryPrice(): string;
 
           public getPriceAmountMicros(): number;
 
           public getSku(): string;
 
-          public getPriceCurrencyCode(): string;
+          public getIntroductoryPricePeriod(): string;
 
           public getType(): string;
 
@@ -287,18 +417,51 @@ declare module com {
           public hashCode(): number;
 
           public getPrice(): string;
+
+          public getFreeTrialPeriod(): string;
         }
 
         export module SkuDetails {
           export class SkuDetailsResult {
-            public constructor(param0: List, param1: number);
-
-            public getResponseCode(): number;
-
-            public getSkuDetailsList(): List<SkuDetails>;
           }
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
+        export class SkuDetailsParams {
+          public constructor();
+
+          public getSkusList(): List;
+
+          public static newBuilder(): com.android.billingclient.api.SkuDetailsParams.Builder;
+
+          public getSkuType(): string;
+        }
+
+        export module SkuDetailsParams {
+          export class Builder {
+            public setType(param0: string): com.android.billingclient.api.SkuDetailsParams.Builder;
+
+            public setSkusList(param0: List): com.android.billingclient.api.SkuDetailsParams.Builder;
+
+            public build(): com.android.billingclient.api.SkuDetailsParams;
+          }
+        }
+      }
+    }
+  }
+}
+
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class SkuDetailsResponseListener {
           /**
            * Constructs a new instance of the SkuDetailsResponseListener interface with the provided implementation.
@@ -310,6 +473,13 @@ declare module com {
           public onSkuDetailsResponse(responseCode: number, skuDetailsList: List<SkuDetails>): void;
         }
       }
+    }
+  }
+}
+
+declare module com {
+  export module android {
+    export module billingclient {
       export module util {
         export class BillingHelper {
           public static RESPONSE_CODE: string;
@@ -333,10 +503,16 @@ declare module com {
 
           public static extractPurchases(param0: Bundle): List;
         }
+      }
+    }
+  }
+}
 
+declare module com {
+  export module android {
+    export module billingclient {
+      export module api {
         export class ProxyBillingActivity {
-          public static RECEIVER_EXTRA: string;
-
           public onActivityResult(param0: number, param1: number, param2: Intent): void;
 
           public constructor();
@@ -348,73 +524,100 @@ declare module com {
   }
 }
 
-// import Parcel = android.os.Parcel;
-// declare module com {
-// 	export module android {
-// 		export module vending {
-// 			export module billing {
-// 				export class IInAppBillingService {
-// 					/**
-// 					 * Constructs a new instance of the com.android.vending.billing.IInAppBillingService interface with the provided implementation.
-// 					 */
-// 					public constructor(implementation: {
-// 						isBillingSupported(param0: number, param1: string, param2: string): number;
-// 						getSkuDetails(param0: number, param1: string, param2: string, param3: Bundle): Bundle;
-// 						getBuyIntent(param0: number, param1: string, param2: string, param3: string, param4: string): Bundle;
-// 						getPurchases(param0: number, param1: string, param2: string, param3: string): Bundle;
-// 						finalizeOrder(param0: number, param1: string, param2: string): number;
-// 						stub(param0: number, param1: string, param2: string): number;
-// 						getBuyIntentToReplaceSkus(param0: number, param1: string, param2: List, param3: string, param4: string, param5: string): Bundle;
-// 						getBuyIntentExtraParams(param0: number, param1: string, param2: string, param3: string, param4: string, param5: Bundle): Bundle;
-// 						getPurchaseHistory(param0: number, param1: string, param2: string, param3: string, param4: Bundle): Bundle;
-// 						isBillingSupportedExtraParams(param0: number, param1: string, param2: string, param3: Bundle): number;
-// 					});
-// 					public getSkuDetails(param0: number, param1: string, param2: string, param3: Bundle): Bundle;
-// 					public isBillingSupportedExtraParams(param0: number, param1: string, param2: string, param3: Bundle): number;
-// 					public stub(param0: number, param1: string, param2: string): number;
-// 					public getPurchases(param0: number, param1: string, param2: string, param3: string): Bundle;
-// 					public finalizeOrder(param0: number, param1: string, param2: string): number;
-// 					public isBillingSupported(param0: number, param1: string, param2: string): number;
-// 					public getBuyIntentExtraParams(param0: number, param1: string, param2: string, param3: string, param4: string, param5: Bundle): Bundle;
-// 					public getBuyIntent(param0: number, param1: string, param2: string, param3: string, param4: string): Bundle;
-// 					public getBuyIntentToReplaceSkus(param0: number, param1: string, param2: List, param3: string, param4: string, param5: string): Bundle;
-// 					public getPurchaseHistory(param0: number, param1: string, param2: string, param3: string, param4: Bundle): Bundle;
-// 				}
-// 				export module IInAppBillingService {
-// 					export abstract class Stub {
-// 						public constructor();
-// 						public getBuyIntentToReplaceSkus(param0: number, param1: string, param2: List, param3: string, param4: string, param5: string): Bundle;
-// 						public getPurchases(param0: number, param1: string, param2: string, param3: string): Bundle;
-// 						public getBuyIntentExtraParams(param0: number, param1: string, param2: string, param3: string, param4: string, param5: Bundle): Bundle;
-// 						public getSkuDetails(param0: number, param1: string, param2: string, param3: Bundle): Bundle;
-// 						public asBinder(): IBinder;
-// 						public stub(param0: number, param1: string, param2: string): number;
-// 						public finalizeOrder(param0: number, param1: string, param2: string): number;
-// 						public isBillingSupportedExtraParams(param0: number, param1: string, param2: string, param3: Bundle): number;
-// 						public isBillingSupported(param0: number, param1: string, param2: string): number;
-// 						public getBuyIntent(param0: number, param1: string, param2: string, param3: string, param4: string): Bundle;
-// 						public static asInterface(param0: IBinder): com.android.vending.billing.IInAppBillingService;
-// 						public getPurchaseHistory(param0: number, param1: string, param2: string, param3: string, param4: Bundle): Bundle;
-// 						public onTransact(param0: number, param1: Parcel, param2: Parcel, param3: number): boolean;
-// 					}
-// 					export module Stub {
-// 						export class Proxy {
-// 							public getInterfaceDescriptor(): string;
-// 							public asBinder(): IBinder;
-// 							public finalizeOrder(param0: number, param1: string, param2: string): number;
-// 							public stub(param0: number, param1: string, param2: string): number;
-// 							public getSkuDetails(param0: number, param1: string, param2: string, param3: Bundle): Bundle;
-// 							public isBillingSupported(param0: number, param1: string, param2: string): number;
-// 							public getPurchases(param0: number, param1: string, param2: string, param3: string): Bundle;
-// 							public getBuyIntent(param0: number, param1: string, param2: string, param3: string, param4: string): Bundle;
-// 							public isBillingSupportedExtraParams(param0: number, param1: string, param2: string, param3: Bundle): number;
-// 							public getBuyIntentExtraParams(param0: number, param1: string, param2: string, param3: string, param4: string, param5: Bundle): Bundle;
-// 							public getBuyIntentToReplaceSkus(param0: number, param1: string, param2: List, param3: string, param4: string, param5: string): Bundle;
-// 							public getPurchaseHistory(param0: number, param1: string, param2: string, param3: string, param4: Bundle): Bundle;
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// }
+declare module com {
+  export module android {
+    export module vending {
+      export module billing {
+        export class IInAppBillingService {
+          /**
+           * Constructs a new instance of the com.android.vending.billing.IInAppBillingService interface with the provided implementation.
+           */
+          public constructor(implementation: {
+            isBillingSupported(param0: number, param1: string, param2: string): number; getSkuDetails(param0: number, param1: string, param2: string, param3: Bundle): Bundle; getBuyIntent(param0: number, param1: string, param2: string, param3: string, param4: string): Bundle; getPurchases(param0: number, param1: string, param2: string, param3: string): Bundle; consumePurchase(param0: number, param1: string, param2: string): number; stub(param0: number, param1: string, param2: string): number; getBuyIntentToReplaceSkus(param0: number, param1: string, param2: List, param3: string, param4: string, param5: string): Bundle; getBuyIntentExtraParams(param0: number, param1: string, param2: string, param3: string, param4: string, param5: Bundle): Bundle; getPurchaseHistory(param0: number, param1: string, param2: string, param3: string, param4: Bundle): Bundle; isBillingSupportedExtraParams(param0: number, param1: string, param2: string, param3: Bundle): number;
+          });
+
+          public getSkuDetails(param0: number, param1: string, param2: string, param3: Bundle): Bundle;
+
+          public isBillingSupportedExtraParams(param0: number, param1: string, param2: string, param3: Bundle): number;
+
+          public stub(param0: number, param1: string, param2: string): number;
+
+          public getPurchases(param0: number, param1: string, param2: string, param3: string): Bundle;
+
+          public consumePurchase(param0: number, param1: string, param2: string): number;
+
+          public isBillingSupported(param0: number, param1: string, param2: string): number;
+
+          public getBuyIntentExtraParams(param0: number, param1: string, param2: string, param3: string, param4: string, param5: Bundle): Bundle;
+
+          public getBuyIntent(param0: number, param1: string, param2: string, param3: string, param4: string): Bundle;
+
+          public getBuyIntentToReplaceSkus(param0: number, param1: string, param2: List, param3: string, param4: string, param5: string): Bundle;
+
+          public getPurchaseHistory(param0: number, param1: string, param2: string, param3: string, param4: Bundle): Bundle;
+        }
+
+        export module IInAppBillingService {
+          export abstract class Stub {
+            public constructor();
+
+            public getBuyIntentToReplaceSkus(param0: number, param1: string, param2: List, param3: string, param4: string, param5: string): Bundle;
+
+            public getPurchases(param0: number, param1: string, param2: string, param3: string): Bundle;
+
+            public getBuyIntentExtraParams(param0: number, param1: string, param2: string, param3: string, param4: string, param5: Bundle): Bundle;
+
+            public getSkuDetails(param0: number, param1: string, param2: string, param3: Bundle): Bundle;
+
+            public asBinder(): IBinder;
+
+            public stub(param0: number, param1: string, param2: string): number;
+
+            public consumePurchase(param0: number, param1: string, param2: string): number;
+
+            public isBillingSupportedExtraParams(param0: number, param1: string, param2: string, param3: Bundle): number;
+
+            public isBillingSupported(param0: number, param1: string, param2: string): number;
+
+            public getBuyIntent(param0: number, param1: string, param2: string, param3: string, param4: string): Bundle;
+
+            public static asInterface(param0: IBinder): com.android.vending.billing.IInAppBillingService;
+
+            public getPurchaseHistory(param0: number, param1: string, param2: string, param3: string, param4: Bundle): Bundle;
+
+            public onTransact(param0: number, param1: Parcel, param2: Parcel, param3: number): boolean;
+          }
+
+          export module Stub {
+            export class Proxy {
+              public getInterfaceDescriptor(): string;
+
+              public asBinder(): IBinder;
+
+              public consumePurchase(param0: number, param1: string, param2: string): number;
+
+              public stub(param0: number, param1: string, param2: string): number;
+
+              public getSkuDetails(param0: number, param1: string, param2: string, param3: Bundle): Bundle;
+
+              public isBillingSupported(param0: number, param1: string, param2: string): number;
+
+              public getPurchases(param0: number, param1: string, param2: string, param3: string): Bundle;
+
+              public getBuyIntent(param0: number, param1: string, param2: string, param3: string, param4: string): Bundle;
+
+              public isBillingSupportedExtraParams(param0: number, param1: string, param2: string, param3: Bundle): number;
+
+              public getBuyIntentExtraParams(param0: number, param1: string, param2: string, param3: string, param4: string, param5: Bundle): Bundle;
+
+              public getBuyIntentToReplaceSkus(param0: number, param1: string, param2: List, param3: string, param4: string, param5: string): Bundle;
+
+              public getPurchaseHistory(param0: number, param1: string, param2: string, param3: string, param4: Bundle): Bundle;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
