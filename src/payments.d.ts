@@ -1,33 +1,7 @@
-import { Failure } from './failure';
 import { Item } from './item';
 import { Order } from './order';
-import { ConnectableObservable, ReplaySubject } from 'rxjs';
 
-export declare type EventPayload = Failure | Item | Order | Array<Item> | Array<string> | number | null;
-
-export declare enum EventResult {
-    STARTED = 'STARTED',
-    PENDING = 'PENDING',
-    FAILURE = 'FAILURE',
-    SUCCESS = 'SUCCESS',
-}
-
-export declare enum EventContext {
-    CONNECTING_STORE = 'CONNECTING_STORE',
-    RETRIEVING_ITEMS = 'RETRIEVING_ITEMS',
-    PROCESSING_ORDER = 'PROCESSING_ORDER',
-    FINALIZING_ORDER = 'FINALIZING_ORDER',
-    RESTORING_ORDERS = 'RESTORING_ORDERS',
-}
-
-export interface IPaymentEvent {
-    context: EventContext;
-    result: EventResult;
-    payload: EventPayload;
-}
-
-export declare const _payments$: ReplaySubject<IPaymentEvent>;
-export declare const payments$: ConnectableObservable<IPaymentEvent>;
+export * from 'payments.common'
 
 export declare function init(): void;
 

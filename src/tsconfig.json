@@ -31,18 +31,15 @@
     "strictPropertyInitialization": false // TODO
   },
   "include": [
-    // references
+    // refs
     "node_modules/tns-platform-declarations/android.d.ts",
     "node_modules/tns-platform-declarations/ios.d.ts",
-    "typings/InAppBillingService.aidl.d.ts",
-    "typings/java!PlayBillingLibrary.d.ts",
-    // sources
-    "failure/**/*",
-    "item/**/*",
-    "order/**/*",
-    "payments.android.ts",
-    "payments.ios.ts",
-    "payments.common.ts"
+    "typings/*",
+    // srcs
+    "failure/*",
+    "item/*",
+    "order/*",
+    "payments.*.ts"
   ],
   "compileOnSave": false
 }
