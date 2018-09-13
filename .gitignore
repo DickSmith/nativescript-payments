@@ -13,5 +13,3 @@ node_modules
 *.ios.d.ts
 *.common.d.ts
 index.d.ts
-!/index.d.ts
-!**/typings/index.d.ts

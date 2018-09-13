@@ -1,7 +1,13 @@
 import { Item } from './item';
 import { Order } from './order';
 
-export * from 'payments.common'
+export {
+  EventContext,
+  EventResult,
+  EventPayload,
+  IPaymentEvent,
+  payments$,
+} from './payments.common';
 
 export declare function init(): void;
 
