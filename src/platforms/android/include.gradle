@@ -1,12 +1,3 @@
-/* Include.gradle configuration: http://docs.nativescript.org/plugins/plugins#includegradle-specification */
-
-android {
-    productFlavors {
-        "nativescript-payments" {
-            dimension "nativescript-payments"
-        }
-    }
-}
 dependencies {
-    compile 'com.android.billingclient:billing:1.1'
+    implementation 'com.android.billingclient:billing:1.1'
 }

@@ -1,0 +1,26 @@
+{
+  "nativescript": {
+    "id": "org.nativescript.xxx",
+    "tns-android": {
+      "version": "4.2.0"
+    },
+    "tns-ios": {
+      "version": "4.2.0"
+    }
+  },
+  "scripts": {
+    "_": "npm run nuke && npm run typings",
+    "nuke": "npx rimraf -- node_modules/ platforms/ package-lock.json",
+    "typings": "export TNS_TYPESCRIPT_DECLARATIONS_PATH=\"$(pwd)/../src/native-typings\" && tns build ios",
+    "ios-gen": "./platforms/ios/internal/metadata-generator/bin/objc-metadata-generator",
+    "ios-gen-arg0": "export IOS_GEN_ARG0='-output-typescript ./native-typings/'",
+    "ios-gen-arg1": "export IOS_GEN_ARG1='Xclang'",
+    "ios-gen-arg2": "export IOS_GEN_ARG2='-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk'",
+    "ios-gen-arg3": "export IOS_GEN_ARG3='-arch x86_64'",
+    "ios-gen-arg4": "export IOS_GEN_ARG4='-miphoneos-version-min=8.0 -std=gnu99'"
+  },
+  "dependencies": {
+    "nativescript-payments": "file:../src",
+    "tns-core-modules": "latest"
+  }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="__PACKAGE__"
+	android:versionCode="1"
+	android:versionName="1.0">
+
+	<application android:name="com.tns.NativeScriptApplication">
+		<activity android:name="com.tns.NativeScriptActivity"/>
+		<activity android:name="com.tns.ErrorReportActivity"/>
+	</application>
+</manifest>

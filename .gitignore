@@ -13,3 +13,4 @@ node_modules
 *.ios.d.ts
 *.common.d.ts
 index.d.ts
+*.aar

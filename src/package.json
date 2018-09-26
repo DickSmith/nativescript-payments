@@ -12,16 +12,6 @@
     }
   },
   "scripts": {
-    "tsc": "tsc -skipLibCheck",
-    "postclone": "npm i && node scripts/postclone.js && cd ../demo && npm i && cd ../src && npm run plugin.link",
-    "test.android": "npm i && npm run tsc && npm run tslint && cd ../demo && tns build android && tns test android --justlaunch",
-    "test.ios": "npm i && npm run tsc && npm run tslint && cd ../demo && tns build ios && tns test ios --justlaunch",
-    "tslint": "cd .. && tslint \"**/*.ts\" --config tslint.json --exclude \"**/node_modules/**\"",
-    "plugin.link": "npm link && cd ../demo && npm link nativescript-xxx && cd ../src",
-    "plugin.tscwatch": "npm run tsc -- -w",
-    "demo.ios": "npm i && npm run tsc && cd ../demo && tns run ios --syncAllFiles",
-    "demo.android": "npm i && npm run tsc && cd ../demo && tns run android --syncAllFiles",
-    "clean": "rm -rf node_modules && cd ../demo && rm -rf hooks node_modules platforms && cd ../src && npm run plugin.link",
     "tns": "tns",
     "lint": "tslint --force --fix --project tsconfig.json",
     "nuke": "rm -rf node_modules/ package-lock.json",
@@ -29,7 +19,7 @@
     "build": "npm run lint && tsc",
     "prepack": "npm run build && cp ../LICENSE ./LICENSE && cp ../README.md ./README.md",
     "postpack": "rm ./LICENSE ./README.md",
-    "android-dts": "cd ../android && java -jar dts-generator-2018-05-21-282560b.jar -input libs/used-billing.jar",
+    "android-dts": "cd ../android && java -jar dts-generator-34a696d.jar -input libs/used-billing.jar",
     "preandroid-dts": "cd ../android && git clean -dfX && ./gradlew getDeps && cd libs && jar xf billing-1.1.aar && mv classes.jar used-billing.jar",
     "postandroid-dts": "mv ../android/out/android.d.ts typings/java\\!PlayBillingLibrary.d.ts"
   },
