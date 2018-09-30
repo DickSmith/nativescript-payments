@@ -12,7 +12,7 @@
       "dom",
       "es2015.iterable"
     ],
-    "sourceMap": true,
+    "sourceMap": false,
     "pretty": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
@@ -36,10 +36,10 @@
     "node_modules/tns-platform-declarations/ios.d.ts",
     "typings/*",
     // srcs
-    "failure/*",
-    "item/*",
-    "order/*",
-    "payments.*.ts"
+    "index.ts",
+    "**/*.android.ts",
+    "**/*.ios.ts",
+    "**/*.common.ts"
   ],
   "compileOnSave": false
 }

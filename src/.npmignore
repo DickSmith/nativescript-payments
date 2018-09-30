@@ -3,9 +3,9 @@
 !LICENSE
 !/platforms/**
 !/typings/**
-*.common.d.ts
-index.d.ts
-index.js
+!*.common.d.ts
+!index.d.ts
+!index.js
 !/failure/*.*.js
 !/item/*.*.js
 !/order/*.*.js
