@@ -1,5 +1,5 @@
 import { BaseItem } from './item.common';
-export type SkuDetails = com.android.billingclient.api.SkuDetails;
+type SkuDetails = com.android.billingclient.api.SkuDetails;
 
 export class Item extends BaseItem {
     public nativeValue: SkuDetails;

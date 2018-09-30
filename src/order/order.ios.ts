@@ -3,6 +3,8 @@ import {
     OrderState,
 } from './order.common';
 
+export { OrderState } from './order.common';
+
 export class Order extends BaseOrder {
     public nativeValue: SKPaymentTransaction;
 

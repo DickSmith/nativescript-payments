@@ -1,4 +1,4 @@
-export type Purchase = com.android.billingclient.api.Purchase;
+type Purchase = com.android.billingclient.api.Purchase;
 
 export abstract class BaseOrder {
     public nativeValue: Purchase | SKPaymentTransaction;

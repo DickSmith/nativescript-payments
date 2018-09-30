@@ -3,6 +3,8 @@ import {
     FailureTypes,
 } from './failure.common';
 
+export { FailureTypes } from './failure.common'
+
 export class Failure extends BaseFailure {
 
     constructor(errorCode: number) {

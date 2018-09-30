@@ -2,7 +2,10 @@ import {
     BaseOrder,
     OrderState,
 } from './order.common';
-export type Purchase = com.android.billingclient.api.Purchase;
+
+type Purchase = com.android.billingclient.api.Purchase;
+
+export { OrderState } from './order.common';
 
 export class Order extends BaseOrder {
     public nativeValue: Purchase;

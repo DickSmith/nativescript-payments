@@ -4,27 +4,27 @@ import { Order } from './order';
 import { ConnectableObservable, ReplaySubject } from 'rxjs';
 import { publish } from 'rxjs/operators';
 
-export type EventPayload = Failure | Item | Order | Array<Item> | Array<string> | number | null;
+export type EventPayload = Failure | Item | Order | Array<Item> | Array<string> | number | null | any;
 
 export enum EventResult {
-    STARTED = 'STARTED',
-    PENDING = 'PENDING',
-    FAILURE = 'FAILURE',
-    SUCCESS = 'SUCCESS',
+  STARTED = 'STARTED',
+  PENDING = 'PENDING',
+  FAILURE = 'FAILURE',
+  SUCCESS = 'SUCCESS',
 }
 
 export enum EventContext {
-    CONNECTING_STORE = 'CONNECTING_STORE',
-    RETRIEVING_ITEMS = 'RETRIEVING_ITEMS',
-    PROCESSING_ORDER = 'PROCESSING_ORDER',
-    FINALIZING_ORDER = 'FINALIZING_ORDER',
-    RESTORING_ORDERS = 'RESTORING_ORDERS',
+  CONNECTING_STORE = 'CONNECTING_STORE',
+  RETRIEVING_ITEMS = 'RETRIEVING_ITEMS',
+  PROCESSING_ORDER = 'PROCESSING_ORDER',
+  FINALIZING_ORDER = 'FINALIZING_ORDER',
+  RESTORING_ORDERS = 'RESTORING_ORDERS',
 }
 
 export interface IPaymentEvent {
-    context: EventContext;
-    result: EventResult;
-    payload: EventPayload;
+  context: EventContext;
+  result: EventResult;
+  payload: EventPayload;
 }
 
 // TODO publishReplay and regular Subject instead?

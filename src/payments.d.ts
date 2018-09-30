@@ -16,8 +16,8 @@ export declare function tearDown(): void;
 export declare function fetchItems(itemIds: Array<string>): void;
 
 export declare function buyItem(
-    item: Item,
-    userData?: string,
+  item: Item,
+  userData?: string,
 ): void;
 
 export declare function finalizeOrder(order: Order): void;
