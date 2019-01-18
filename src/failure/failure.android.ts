@@ -7,7 +7,7 @@ export { FailureTypes } from './failure.common';
 
 export class Failure extends BaseFailure {
 
-    constructor(errorCode: number) {
+    constructor(errorCode: number | null) {
         super(errorCode);
         switch ( errorCode ) {
             case com.android.billingclient.api.BillingClient.BillingResponse.FEATURE_NOT_SUPPORTED: /*-2*/

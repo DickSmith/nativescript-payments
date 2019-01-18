@@ -1,9 +1,9 @@
 export abstract class BaseFailure {
     protected _type: FailureTypes | null;
     protected _description: string;
-    protected _nativeCode: number;
+    protected _nativeCode: number | null;
 
-    constructor(errorCode: number) {
+    constructor(errorCode: number | null) {
         this._nativeCode = errorCode;
     }
 
@@ -15,7 +15,7 @@ export abstract class BaseFailure {
         return this._description;
     }
 
-    public get nativeCode(): number {
+    public get nativeCode(): number | null {
         return this._nativeCode;
     }
 }

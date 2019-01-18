@@ -6,6 +6,7 @@ import {
   _payments$,
   EventContext,
   EventResult,
+  Event,
 } from './payments.common';
 // java
 type List<T> = java.util.List<T>;
@@ -20,8 +21,8 @@ type PurchasesResult = com.android.billingclient.api.Purchase.PurchasesResult;
 export {
   EventContext,
   EventResult,
-  EventPayload,
   IPaymentEvent,
+  Event,
   payments$,
 } from './payments.common';
 
@@ -30,8 +31,8 @@ let _billingClient: BillingClient | null;
 export function init(): void {
   if (!_billingClient) {
     _payments$.next({
-      context: EventContext.CONNECTING_STORE,
-      result: EventResult.STARTED,
+      context: Event.Context.CONNECTING_STORE,
+      result: Event.Result.STARTED,
       payload: null,
     });
     if (TnsApplication.android && <Context>TnsApplication.android.context) {
@@ -46,8 +47,8 @@ export function init(): void {
         }))
         .build();
       _payments$.next({
-        context: EventContext.CONNECTING_STORE,
-        result: EventResult.PENDING,
+        context: Event.Context.CONNECTING_STORE,
+        result: Event.Result.PENDING,
         payload: null,
       });
       _billingClient.startConnection(new com.android.billingclient.api.BillingClientStateListener({
@@ -59,15 +60,15 @@ export function init(): void {
                 _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP); // TODO
               _purchaseHandler(purchaseResult.getResponseCode(), purchaseResult.getPurchasesList());
               _payments$.next({
-                context: EventContext.CONNECTING_STORE,
-                result: EventResult.SUCCESS,
+                context: Event.Context.CONNECTING_STORE,
+                result: Event.Result.SUCCESS,
                 payload: null,
               });
             } else {
               console.error(new Error('Init failed with code: ' + resultCode));
               _payments$.next({
-                context: EventContext.CONNECTING_STORE,
-                result: EventResult.FAILURE,
+                context: Event.Context.CONNECTING_STORE,
+                result: Event.Result.FAILURE,
                 payload: new Failure(resultCode),
               });
             }
@@ -96,8 +97,8 @@ export function tearDown() {
 export function fetchItems(itemIds: Array<string>): void {
   if (_billingClient) {
     _payments$.next({
-      context: EventContext.RETRIEVING_ITEMS,
-      result: EventResult.STARTED,
+      context: Event.Context.RETRIEVING_ITEMS,
+      result: Event.Result.STARTED,
       payload: itemIds,
     });
     const _skuList: List<string> = new java.util.ArrayList<string>();
@@ -112,22 +113,22 @@ export function fetchItems(itemIds: Array<string>): void {
             products.push(new Item(skuDetailsList.get(i)));
           }
           _payments$.next({
-            context: EventContext.RETRIEVING_ITEMS,
-            result: EventResult.SUCCESS,
+            context: Event.Context.RETRIEVING_ITEMS,
+            result: Event.Result.SUCCESS,
             payload: products,
           });
         } else {
           _payments$.next({
-            context: EventContext.RETRIEVING_ITEMS,
-            result: EventResult.FAILURE,
+            context: Event.Context.RETRIEVING_ITEMS,
+            result: Event.Result.FAILURE,
             payload: new Failure(responseCode),
           });
         }
       },
     }));
     _payments$.next({
-      context: EventContext.RETRIEVING_ITEMS,
-      result: EventResult.PENDING,
+      context: Event.Context.RETRIEVING_ITEMS,
+      result: Event.Result.PENDING,
       payload: itemIds,
     });
   } else {
@@ -144,8 +145,8 @@ export function buyItem(
       .getPurchasesList().size(); // TODO inapp? safe?
     if (!pendingCount) {
       _payments$.next({
-        context: EventContext.PROCESSING_ORDER,
-        result: EventResult.PENDING,
+        context: Event.Context.PROCESSING_ORDER,
+        result: Event.Result.PENDING,
         payload: pendingCount + 1,
       }); // TODO elsewhere ?
       const paramsBuilder = com.android.billingclient.api.BillingFlowParams.newBuilder()
@@ -160,21 +161,21 @@ export function buyItem(
       );
       if (responseCode === com.android.billingclient.api.BillingClient.BillingResponse.OK) {
         _payments$.next({
-          context: EventContext.PROCESSING_ORDER,
-          result: EventResult.STARTED,
+          context: Event.Context.PROCESSING_ORDER,
+          result: Event.Result.STARTED,
           payload: item,
         });
       } else {
         _payments$.next({
-          context: EventContext.PROCESSING_ORDER,
-          result: EventResult.FAILURE,
+          context: Event.Context.PROCESSING_ORDER,
+          result: Event.Result.FAILURE,
           payload: new Failure(responseCode),
         });
       }
     } else {
       _payments$.next({
-        context: EventContext.PROCESSING_ORDER,
-        result: EventResult.PENDING,
+        context: Event.Context.PROCESSING_ORDER,
+        result: Event.Result.PENDING,
         payload: pendingCount,
       });
     }
@@ -186,8 +187,8 @@ export function buyItem(
 export function finalizeOrder(order: Order): void {
   if (_billingClient) {
     _payments$.next({
-      context: EventContext.FINALIZING_ORDER,
-      result: EventResult.STARTED,
+      context: Event.Context.FINALIZING_ORDER,
+      result: Event.Result.STARTED,
       payload: order,
     });
     if (order.state === OrderState.VALID && !order.restored) {
@@ -199,22 +200,22 @@ export function finalizeOrder(order: Order): void {
           if (_billingClient) {
             if (responseCode === com.android.billingclient.api.BillingClient.BillingResponse.OK) {
               _payments$.next({
-                context: EventContext.FINALIZING_ORDER,
-                result: EventResult.SUCCESS,
+                context: Event.Context.FINALIZING_ORDER,
+                result: Event.Result.SUCCESS,
                 payload: new Order(order.nativeValue),
               });
             } else {
               _payments$.next({
-                context: EventContext.FINALIZING_ORDER,
-                result: EventResult.FAILURE,
+                context: Event.Context.FINALIZING_ORDER,
+                result: Event.Result.FAILURE,
                 payload: new Failure(responseCode),
               });
             }
             const pending: List<Purchase> = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP)
               .getPurchasesList();
             _payments$.next({
-              context: EventContext.PROCESSING_ORDER,
-              result: EventResult.PENDING,
+              context: Event.Context.PROCESSING_ORDER,
+              result: Event.Result.PENDING,
               payload: pending ? pending.size() : 0,
             });
           } else {
@@ -223,14 +224,14 @@ export function finalizeOrder(order: Order): void {
         },
       }));
       _payments$.next({
-        context: EventContext.FINALIZING_ORDER,
-        result: EventResult.PENDING,
+        context: Event.Context.FINALIZING_ORDER,
+        result: Event.Result.PENDING,
         payload: order,
       });
     } else {
       _payments$.next({
-        context: EventContext.FINALIZING_ORDER,
-        result: EventResult.FAILURE,
+        context: Event.Context.FINALIZING_ORDER,
+        result: Event.Result.FAILURE,
         payload: new Failure(8),
       });
     }
@@ -242,8 +243,8 @@ export function finalizeOrder(order: Order): void {
 export function restoreOrders(): void {
   if (_billingClient) {
     _payments$.next({
-      context: EventContext.RESTORING_ORDERS,
-      result: EventResult.STARTED,
+      context: Event.Context.RESTORING_ORDERS,
+      result: Event.Result.STARTED,
       payload: null,
     });
     _billingClient.queryPurchaseHistoryAsync(
@@ -255,26 +256,26 @@ export function restoreOrders(): void {
               const purchase: Purchase = purchasesList.get(i);
               if (purchase) {
                 _payments$.next({
-                  context: EventContext.PROCESSING_ORDER,
-                  result: EventResult.SUCCESS,
+                  context: Event.Context.PROCESSING_ORDER,
+                  result: Event.Result.SUCCESS,
                   payload: new Order(purchase, true),
                 });
                 _payments$.next({
-                  context: EventContext.RESTORING_ORDERS,
-                  result: EventResult.PENDING,
+                  context: Event.Context.RESTORING_ORDERS,
+                  result: Event.Result.PENDING,
                   payload: new Order(purchase, true),
                 });
               }
             }
             _payments$.next({
-              context: EventContext.RESTORING_ORDERS,
-              result: EventResult.SUCCESS,
+              context: Event.Context.RESTORING_ORDERS,
+              result: Event.Result.SUCCESS,
               payload: null,
             });
           } else {
             _payments$.next({
-              context: EventContext.RESTORING_ORDERS,
-              result: EventResult.FAILURE,
+              context: Event.Context.RESTORING_ORDERS,
+              result: Event.Result.FAILURE,
               payload: new Failure(responseCode),
             });
           }
@@ -297,8 +298,8 @@ function _purchaseHandler(
     let pending: List<Purchase>;
     pending = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP).getPurchasesList();
     _payments$.next({
-      context: EventContext.PROCESSING_ORDER,
-      result: EventResult.PENDING,
+      context: Event.Context.PROCESSING_ORDER,
+      result: Event.Result.PENDING,
       payload: pending ? pending.size() : 0,
     });
     if (responseCode === com.android.billingclient.api.BillingClient.BillingResponse.OK) {
@@ -307,8 +308,8 @@ function _purchaseHandler(
           const purchase: Purchase = purchases.get(i);
           if (purchase) {
             _payments$.next({
-              context: EventContext.PROCESSING_ORDER,
-              result: EventResult.SUCCESS,
+              context: Event.Context.PROCESSING_ORDER,
+              result: Event.Result.SUCCESS,
               payload: new Order(purchase),
             });
           }
@@ -316,15 +317,15 @@ function _purchaseHandler(
       }
     } else {
       _payments$.next({
-        context: EventContext.PROCESSING_ORDER,
-        result: EventResult.FAILURE,
+        context: Event.Context.PROCESSING_ORDER,
+        result: Event.Result.FAILURE,
         payload: new Failure(responseCode),
       });
     }
     pending = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP).getPurchasesList();
     _payments$.next({
-      context: EventContext.PROCESSING_ORDER,
-      result: EventResult.PENDING,
+      context: Event.Context.PROCESSING_ORDER,
+      result: Event.Result.PENDING,
       payload: pending ? pending.size() : 0,
     });
   } else {

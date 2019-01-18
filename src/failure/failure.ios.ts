@@ -7,7 +7,7 @@ export { FailureTypes } from './failure.common';
 
 export class Failure extends BaseFailure {
 
-    constructor(errorCode: number) {
+    constructor(errorCode: number | null) {
         super(errorCode);
         switch ( errorCode ) { // TODO Handle Domain?
             case SKErrorCode.Unknown: /*0*/

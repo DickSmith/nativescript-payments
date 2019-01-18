@@ -4,9 +4,9 @@ import { Order } from './order';
 export {
   EventContext,
   EventResult,
-  EventPayload,
   IPaymentEvent,
   payments$,
+  Event,
 } from './payments.common';
 
 export declare function init(): void;
