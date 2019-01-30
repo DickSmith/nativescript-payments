@@ -4,7 +4,7 @@ import { Order } from './order';
 import { ConnectableObservable, ReplaySubject } from 'rxjs';
 import { publish } from 'rxjs/operators';
 
-export namespace Event {
+export namespace PaymentEvent {
 
   export enum Context {
     CONNECTING_STORE = 'CONNECTING_STORE',
@@ -218,27 +218,27 @@ export namespace Event {
 }
 
 /**
- * @deprecated since v0.1.2; use Event.Type instead.
+ * @deprecated since v0.1.2; use PaymentEvent.Type instead.
  */
-export type IPaymentEvent = Event.Type;
+export type IPaymentEvent = PaymentEvent.Type;
 /**
- * @deprecated since v0.1.2; use Event.Context instead.
+ * @deprecated since v0.1.2; use PaymentEvent.Context instead.
  */
-export const EventContext = Event.Context;
+export const EventContext = PaymentEvent.Context;
 /**
- * @deprecated since v0.1.2; use Event.Result instead.
+ * @deprecated since v0.1.2; use PaymentEvent.Result instead.
  */
-export const EventResult = Event.Result;
+export const EventResult = PaymentEvent.Result;
 
 // TODO publishReplay and regular Subject instead?
 /**
  * @private DO NOT USE!
  */
-export const _payments$: ReplaySubject<Event.Type> = new ReplaySubject<Event.Type>(128);
+export const _payments$: ReplaySubject<PaymentEvent.Type> = new ReplaySubject<PaymentEvent.Type>(128);
 /**
  * ConnectableObservable to receive results and events
  */
-export const payments$: ConnectableObservable<Event.Type> = <ConnectableObservable<Event.Type>>_payments$.pipe(publish());
+export const payments$: ConnectableObservable<PaymentEvent.Type> = <ConnectableObservable<PaymentEvent.Type>>_payments$.pipe(publish());
 
 // const _storeConnecting$: Subject<any> = new Subject<any>();
 // const _itemsRetrieving$: Subject<any> = new Subject<any>();

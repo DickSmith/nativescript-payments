@@ -6,7 +6,7 @@ export {
   EventResult,
   IPaymentEvent,
   payments$,
-  Event,
+  PaymentEvent,
 } from './payments.common';
 
 export declare function init(): void;

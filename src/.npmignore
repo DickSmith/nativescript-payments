@@ -3,10 +3,10 @@
 !LICENSE
 !/platforms/**
 !/typings/**
-!*.common.d.ts
-!index.d.ts
-!index.js
-!/failure/*.*.js
-!/item/*.*.js
-!/order/*.*.js
-!/payments.*.js
+!**/*.common.d.ts
+!**/index.d.ts
+!**/failure.d.ts
+!**/item.d.ts
+!**/order.d.ts
+!**/payments.d.ts
+!**/*.js

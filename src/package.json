@@ -13,6 +13,7 @@
   },
   "scripts": {
     "tns": "tns",
+    "tsc": "tsc",
     "lint": "tslint --force --fix --project tsconfig.json",
     "nuke": "rm -rf node_modules/ package-lock.json",
     "nuki": "npm run nuke && npm i",
