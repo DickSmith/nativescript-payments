@@ -4,8 +4,6 @@ import { Item } from './item';
 import { Order, OrderState } from './order';
 import {
   _payments$,
-  EventContext,
-  EventResult,
   PaymentEvent,
 } from './payments.common';
 // java
@@ -17,15 +15,6 @@ type Purchase = com.android.billingclient.api.Purchase;
 type BillingClient = com.android.billingclient.api.BillingClient;
 type SkuDetails = com.android.billingclient.api.SkuDetails;
 type PurchasesResult = com.android.billingclient.api.Purchase.PurchasesResult;
-
-export {
-  EventContext,
-  EventResult,
-  IPaymentEvent,
-  PaymentEvent,
-  payments$,
-} from './payments.common';
-
 let _billingClient: BillingClient | null;
 
 export function init(): void {
@@ -95,6 +84,14 @@ export function tearDown() {
 }
 
 export function fetchItems(itemIds: Array<string>): void {
+  fetchProducts(itemIds, com.android.billingclient.api.BillingClient.SkuType.INAPP);
+}
+
+export function fetchSubscriptions(itemIds: Array<string>): void {
+  fetchProducts(itemIds, com.android.billingclient.api.BillingClient.SkuType.SUBS);
+}
+
+export function fetchProducts(itemIds: Array<string>, skuType: string): void {
   if (_billingClient) {
     _payments$.next({
       context: PaymentEvent.Context.RETRIEVING_ITEMS,
@@ -104,7 +101,7 @@ export function fetchItems(itemIds: Array<string>): void {
     const _skuList: List<string> = new java.util.ArrayList<string>();
     itemIds.forEach((value: string) => _skuList.add(value)); // TODO ?
     const params = com.android.billingclient.api.SkuDetailsParams.newBuilder();
-    params.setSkusList(_skuList).setType(com.android.billingclient.api.BillingClient.SkuType.INAPP);
+    params.setSkusList(_skuList).setType(skuType);
     _billingClient.querySkuDetailsAsync(params.build(), new com.android.billingclient.api.SkuDetailsResponseListener({
       onSkuDetailsResponse(responseCode: number, skuDetailsList: List<SkuDetails>): void {
         if (responseCode === com.android.billingclient.api.BillingClient.BillingResponse.OK) {
@@ -140,8 +137,23 @@ export function buyItem(
   item: Item,
   userData?: string,
 ): void {
+  startOrder(item, com.android.billingclient.api.BillingClient.SkuType.INAPP, userData);
+}
+
+export function startSubscription(
+  item: Item,
+  userData?: string,
+): void {
+  startOrder(item, com.android.billingclient.api.BillingClient.SkuType.SUBS, userData);
+}
+
+export function startOrder(
+  item: Item,
+  skuType: string,
+  userData?: string,
+): void {
   if (_billingClient) {
-    const pendingCount = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP)
+    const pendingCount = _billingClient.queryPurchases(skuType)
       .getPurchasesList().size(); // TODO inapp? safe?
     if (!pendingCount) {
       _payments$.next({
@@ -151,7 +163,7 @@ export function buyItem(
       }); // TODO elsewhere ?
       const paramsBuilder = com.android.billingclient.api.BillingFlowParams.newBuilder()
         .setSku(item.itemId)
-        .setType(com.android.billingclient.api.BillingClient.SkuType.INAPP);
+        .setType(skuType);
       if (userData) {
         paramsBuilder.setAccountId(userData);
       }

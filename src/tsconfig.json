@@ -17,11 +17,9 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noEmitHelpers": true,
-    "noEmitOnError": true,
-    "noImplicitAny": true,
+    "noEmitOnError": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": false,
-//    "noUnusedLocals": true,
     "noImplicitThis": true,
     "skipLibCheck": true,
     "strict": true,
@@ -31,15 +29,15 @@
     "strictPropertyInitialization": false // TODO
   },
   "include": [
-    // refs
-    "node_modules/tns-platform-declarations/android.d.ts",
-    "node_modules/tns-platform-declarations/ios.d.ts",
-    "typings/*",
-    // srcs
-    "index.ts",
-    "**/*.android.ts",
-    "**/*.ios.ts",
-    "**/*.common.ts"
+    "./node_modules/tns-platform-declarations/android.d.ts",
+    "./node_modules/tns-platform-declarations/ios.d.ts",
+    "./typings/*",
+  ],
+  "files": [
+    "./payments.common.ts",
+    "./payments.android.ts",
+    "./payments.ios.ts",
+    "./index.ts"
   ],
   "compileOnSave": false
 }
