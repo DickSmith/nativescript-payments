@@ -45,14 +45,36 @@ export function init(): void {
           if (_billingClient) {
             if (resultCode === com.android.billingclient.api.BillingClient.BillingResponse.OK) {
               // Handle transactions already in queue
-              const purchaseResult: PurchasesResult =
-                _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP); // TODO
-              _purchaseHandler(purchaseResult.getResponseCode(), purchaseResult.getPurchasesList());
-              _payments$.next({
-                context: PaymentEvent.Context.CONNECTING_STORE,
-                result: PaymentEvent.Result.SUCCESS,
-                payload: null,
-              });
+              // INAPP
+              _billingClient.queryPurchaseHistoryAsync(com.android.billingclient.api.BillingClient.SkuType.INAPP, new com.android.billingclient.api.PurchaseHistoryResponseListener({
+                onPurchaseHistoryResponse: (responseCode, purchaseList) => {
+                  _purchaseHandler(responseCode, purchaseList, com.android.billingclient.api.BillingClient.SkuType.INAPP);
+                  _payments$.next({
+                    context: PaymentEvent.Context.CONNECTING_STORE,
+                    result: PaymentEvent.Result.SUCCESS,
+                    payload: null,
+                  });
+                },
+              }));
+              // SUBS
+              _billingClient.queryPurchaseHistoryAsync(com.android.billingclient.api.BillingClient.SkuType.SUBS, new com.android.billingclient.api.PurchaseHistoryResponseListener({
+                onPurchaseHistoryResponse: (responseCode, purchaseList) => {
+                  _purchaseHandler(responseCode, purchaseList, com.android.billingclient.api.BillingClient.SkuType.SUBS);
+                  _payments$.next({
+                    context: PaymentEvent.Context.CONNECTING_STORE,
+                    result: PaymentEvent.Result.SUCCESS,
+                    payload: null,
+                  });
+                },
+              }));
+              // const purchaseResult: PurchasesResult =
+              //   _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP); // TODO
+              // _purchaseHandler(purchaseResult.getResponseCode(), purchaseResult.getPurchasesList());
+              // _payments$.next({
+              //   context: PaymentEvent.Context.CONNECTING_STORE,
+              //   result: PaymentEvent.Result.SUCCESS,
+              //   payload: null,
+              // });
             } else {
               console.error(new Error('Init failed with code: ' + resultCode));
               _payments$.next({
@@ -306,10 +328,13 @@ export function canMakePayments(/*types*/): boolean {
 function _purchaseHandler(
   responseCode: number,
   purchases: List<Purchase>,
+  skuType?: string
 ) {
   if (_billingClient) {
-    let pending: List<Purchase>;
-    pending = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP).getPurchasesList();
+    let pending: List<Purchase> = purchases;
+    if (!skuType) {
+      pending = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP).getPurchasesList();
+    }
     _payments$.next({
       context: PaymentEvent.Context.PROCESSING_ORDER,
       result: PaymentEvent.Result.PENDING,
@@ -335,12 +360,13 @@ function _purchaseHandler(
         payload: new Failure(responseCode),
       });
     }
-    pending = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP).getPurchasesList();
-    _payments$.next({
-      context: PaymentEvent.Context.PROCESSING_ORDER,
-      result: PaymentEvent.Result.PENDING,
-      payload: pending ? pending.size() : 0,
-    });
+    // TODO: Ask Richard: why is this duplicated here?
+    // pending = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP).getPurchasesList();
+    // _payments$.next({
+    //   context: PaymentEvent.Context.PROCESSING_ORDER,
+    //   result: PaymentEvent.Result.PENDING,
+    //   payload: pending ? pending.size() : 0,
+    // });
   } else {
     console.error(new Error('BillingClient missing.'));
   }

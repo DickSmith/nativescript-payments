@@ -49,6 +49,12 @@
     "name": "Dick Smith",
     "email": "github@dicksmith.com"
   },
+  "contributors": [
+    {
+      "name": "Nathan Walker",
+      "url": "https://github.com/NathanWalker"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/DickSmith/nativescript-payments/issues"
   },
