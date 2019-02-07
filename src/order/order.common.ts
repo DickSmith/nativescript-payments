@@ -11,6 +11,7 @@ export abstract class BaseOrder {
     public receiptToken: string;
     public userData: string;
     public restored: boolean;
+    public isSubscription: boolean;
     /** Android only */
     public dataSignature: string;
 

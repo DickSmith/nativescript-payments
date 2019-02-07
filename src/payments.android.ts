@@ -220,54 +220,63 @@ export function startOrder(
 
 export function finalizeOrder(order: Order): void {
   if (_billingClient) {
-    _payments$.next({
-      context: PaymentEvent.Context.FINALIZING_ORDER,
-      result: PaymentEvent.Result.STARTED,
-      payload: order,
-    });
-    if (order.state === OrderState.VALID && !order.restored) {
-      _billingClient.consumeAsync(order.receiptToken, new com.android.billingclient.api.ConsumeResponseListener({
-        onConsumeResponse(
-          responseCode: number,
-          purchaseToken: string
-        ): void {
-          if (_billingClient) {
-            if (responseCode === com.android.billingclient.api.BillingClient.BillingResponse.OK) {
-              _payments$.next({
-                context: PaymentEvent.Context.FINALIZING_ORDER,
-                result: PaymentEvent.Result.SUCCESS,
-                payload: new Order(order.nativeValue),
-              });
-            } else {
-              _payments$.next({
-                context: PaymentEvent.Context.FINALIZING_ORDER,
-                result: PaymentEvent.Result.FAILURE,
-                payload: new Failure(responseCode),
-              });
-            }
-            const pending: List<Purchase> = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP)
-              .getPurchasesList();
-            _payments$.next({
-              context: PaymentEvent.Context.PROCESSING_ORDER,
-              result: PaymentEvent.Result.PENDING,
-              payload: pending ? pending.size() : 0,
-            });
-          } else {
-            console.error(new Error('BillingClient missing.'));
-          }
-        },
-      }));
+    if (order.isSubscription) {
+      // subscriptions don't need to be consumed, they are done at this point
       _payments$.next({
         context: PaymentEvent.Context.FINALIZING_ORDER,
-        result: PaymentEvent.Result.PENDING,
-        payload: order,
+        result: PaymentEvent.Result.SUCCESS,
+        payload: new Order(order.nativeValue),
       });
     } else {
       _payments$.next({
         context: PaymentEvent.Context.FINALIZING_ORDER,
-        result: PaymentEvent.Result.FAILURE,
-        payload: new Failure(8),
+        result: PaymentEvent.Result.STARTED,
+        payload: order,
       });
+      if (order.state === OrderState.VALID && !order.restored) {
+        _billingClient.consumeAsync(order.receiptToken, new com.android.billingclient.api.ConsumeResponseListener({
+          onConsumeResponse(
+            responseCode: number,
+            purchaseToken: string
+          ): void {
+            if (_billingClient) {
+              if (responseCode === com.android.billingclient.api.BillingClient.BillingResponse.OK) {
+                _payments$.next({
+                  context: PaymentEvent.Context.FINALIZING_ORDER,
+                  result: PaymentEvent.Result.SUCCESS,
+                  payload: new Order(order.nativeValue),
+                });
+              } else {
+                _payments$.next({
+                  context: PaymentEvent.Context.FINALIZING_ORDER,
+                  result: PaymentEvent.Result.FAILURE,
+                  payload: new Failure(responseCode),
+                });
+              }
+              const pending: List<Purchase> = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP)
+                .getPurchasesList();
+              _payments$.next({
+                context: PaymentEvent.Context.PROCESSING_ORDER,
+                result: PaymentEvent.Result.PENDING,
+                payload: pending ? pending.size() : 0,
+              });
+            } else {
+              console.error(new Error('BillingClient missing.'));
+            }
+          },
+        }));
+        _payments$.next({
+          context: PaymentEvent.Context.FINALIZING_ORDER,
+          result: PaymentEvent.Result.PENDING,
+          payload: order,
+        });
+      } else {
+        _payments$.next({
+          context: PaymentEvent.Context.FINALIZING_ORDER,
+          result: PaymentEvent.Result.FAILURE,
+          payload: new Failure(8),
+        });
+      }
     }
   } else {
     console.error(new Error('BillingClient missing.'));
@@ -333,6 +342,7 @@ function _purchaseHandler(
   if (_billingClient) {
     let pending: List<Purchase> = purchases;
     if (!skuType) {
+      // default inapp
       pending = _billingClient.queryPurchases(com.android.billingclient.api.BillingClient.SkuType.INAPP).getPurchasesList();
     }
     _payments$.next({
@@ -345,10 +355,11 @@ function _purchaseHandler(
         for (let i = 0; i < purchases.size(); i++) {
           const purchase: Purchase = purchases.get(i);
           if (purchase) {
+            const order = new Order(purchase);
             _payments$.next({
               context: PaymentEvent.Context.PROCESSING_ORDER,
               result: PaymentEvent.Result.SUCCESS,
-              payload: new Order(purchase),
+              payload: order,
             });
           }
         }
