@@ -7,8 +7,8 @@
   "nativescript": {
     "category": "Utilities",
     "platforms": {
-      "ios": "3.4.1",
-      "android": "3.4.1"
+      "ios": "5.4.0",
+      "android": "5.4.0"
     }
   },
   "scripts": {
@@ -22,7 +22,11 @@
     "postpack": "rm ./LICENSE ./README.md",
     "android-dts": "cd ../android && java -jar dts-generator-32ad4e0.jar -input libs/used-billing.jar",
     "preandroid-dts": "cd ../android && git clean -dfX && ./gradlew getDeps && cd libs && jar xf billing-1.2.aar && mv classes.jar used-billing.jar",
-    "postandroid-dts": "mv ../android/out/android.d.ts typings/java\\!PlayBillingLibrary.d.ts"
+    "postandroid-dts": "mv ../android/out/android.d.ts typings/java\\!PlayBillingLibrary.d.ts",
+    "husky-precommit-0": "pretty-quick --staged --pattern 'src/**/*.@(scss|component.html|ts|md|js|json)'",
+    "husky-precommit-1": "cp .prettierrc-pre .prettierrc && npm run husky-precommit-0",
+    "husky-precommit-2": "cp .prettierrc-post .prettierrc && npm run husky-precommit-0",
+    "husky-precommit": "npm run husky-precommit-1 && npm run husky-precommit-2"
   },
   "repository": {
     "type": "git",
@@ -52,17 +56,18 @@
   "homepage": "https://github.com/DickSmith/nativescript-payments",
   "readmeFilename": "README.md",
   "peerDependencies": {
-    "tns-core-modules": ">=5.1.2",
+    "tns-core-modules": ">=5.4.0",
     "rxjs": "^6.0.0"
   },
   "devDependencies": {
-    "prompt": "^1.0.0",
-    "rimraf": "^2.5.0",
+    "husky": "~2.4.1",
+    "prettier": "~1.17.1",
+    "pretty-quick": "~1.11.1",
     "rxjs": "^6.0.0",
-    "tns-core-modules": "~5.1.2",
-    "tns-platform-declarations": "~5.1.2",
-    "tslint": "~5.12.1",
-    "typescript": "~3.2.2"
+    "tns-core-modules": "~5.4.3",
+    "tns-platform-declarations": "~5.4.3",
+    "tslint": "~5.17.0",
+    "typescript": "~3.2.4"
   },
   "bootstrapper": "nativescript-plugin-seed"
 }
