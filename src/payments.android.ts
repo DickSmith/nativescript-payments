@@ -290,6 +290,7 @@ export function canMakePayments(/*types*/): boolean {
   return true; // TODO isReady?
 }
 
+
 function _purchaseHandler(
   responseCode: number,
   purchases: List<Purchase>,
