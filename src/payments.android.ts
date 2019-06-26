@@ -291,7 +291,6 @@ export function canMakePayments(/*types*/): boolean {
 }
 
 
-
 function _purchaseHandler(
   responseCode: number,
   purchases: List<Purchase>,
