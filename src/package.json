@@ -23,7 +23,7 @@
     "android-dts": "cd ../android && java -jar dts-generator-32ad4e0.jar -input libs/used-billing.jar",
     "preandroid-dts": "cd ../android && git clean -dfX && ./gradlew getDeps && cd libs && jar xf billing-1.2.aar && mv classes.jar used-billing.jar",
     "postandroid-dts": "mv ../android/out/android.d.ts typings/java\\!PlayBillingLibrary.d.ts",
-    "husky-precommit-0": "pretty-quick --staged --pattern '!(platforms|node_modules)/**/*.@(scss|component.html|ts|md|js|json)'",
+    "husky-precommit-0": "pretty-quick --staged --pattern '**/!(platforms|node_modules)/**/*.@(ts|md|js|json)' --pattern './*.@(ts|md|js|json)'",
     "husky-precommit-1": "cp .prettierrc-pre .prettierrc && npm run husky-precommit-0",
     "husky-precommit-2": "cp .prettierrc-post .prettierrc && npm run husky-precommit-0",
     "husky-precommit": "npm run husky-precommit-1 && npm run husky-precommit-2"
