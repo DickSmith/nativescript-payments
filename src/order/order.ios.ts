@@ -38,7 +38,7 @@ export class Order extends BaseOrder {
             ? nativeValue.transactionReceipt.base64EncodedStringWithOptions(NSDataBase64EncodingOptions.Encoding64CharacterLineLength)
             : 'undefined';
         this.userData = nativeValue.payment ? nativeValue.payment.applicationUsername : 'undefined';
-
+        // TODO: handle isSubscription flag?
     }
 
     get debug(): string | null {

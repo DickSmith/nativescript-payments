@@ -4,6 +4,7 @@ import { Order } from './order';
 import { ConnectableObservable, ReplaySubject } from 'rxjs';
 import { publish } from 'rxjs/operators';
 
+// tslint:disable-next-line:no-namespace
 export namespace PaymentEvent {
 
   export enum Context {
@@ -224,10 +225,12 @@ export type IPaymentEvent = PaymentEvent.Type;
 /**
  * @deprecated since v0.1.2; use PaymentEvent.Context instead.
  */
+// tslint:disable-next-line:variable-name
 export const EventContext = PaymentEvent.Context;
 /**
  * @deprecated since v0.1.2; use PaymentEvent.Result instead.
  */
+// tslint:disable-next-line:variable-name
 export const EventResult = PaymentEvent.Result;
 
 // TODO publishReplay and regular Subject instead?

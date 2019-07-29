@@ -3,17 +3,7 @@ import { Item } from './item';
 import { Order, OrderState } from './order';
 import {
   _payments$,
-  EventContext,
-  EventResult,
   PaymentEvent,
-} from './payments.common';
-
-export {
-  EventContext,
-  EventResult,
-  IPaymentEvent,
-  PaymentEvent,
-  payments$,
 } from './payments.common';
 
 let _productRequest: SKProductsRequest | null;

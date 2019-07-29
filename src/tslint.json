@@ -54,7 +54,7 @@
     "match-default-export-name": true,
     "max-line-length": [
       true,
-      160
+      500
     ],
     "member-access": true,
     "member-ordering": [
@@ -101,10 +101,9 @@
     "no-trailing-whitespace": true,
     "no-unnecessary-initializer": true,
     "no-unnecessary-qualifier": true,
-    "no-unsafe-any": true,
+    "no-unsafe-any": false,
     "no-unused-expression": true,
     "number-literal-format": true,
-    "no-use-before-declare": true,
     "no-var-keyword": true,
     "object-literal-key-quotes": [
       true,

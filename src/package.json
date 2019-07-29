@@ -1,6 +1,6 @@
 {
   "name": "nativescript-payments",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "A NativeScript plugin for in-app payments",
   "main": "index",
   "typings": "index.d.ts",
@@ -49,6 +49,12 @@
     "name": "Dick Smith",
     "email": "github@dicksmith.com"
   },
+  "contributors": [
+    {
+      "name": "Nathan Walker",
+      "url": "https://github.com/NathanWalker"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/DickSmith/nativescript-payments/issues"
   },
