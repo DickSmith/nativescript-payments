@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    // To target es6 may need to switch `XXX extends YYY` to (<any>YYY).extend(...
+    "target": "es5",
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
