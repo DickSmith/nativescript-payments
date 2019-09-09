@@ -1,0 +1,55 @@
+{
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "jsxBracketSameLine": false,
+  "arrowParens": "avoid",
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "css",
+  "endOfLine": "lf",
+  "overrides": [
+    {
+      "files": [
+        "*.component.html"
+      ],
+      "options": {
+        "parser": "angular",
+        "printWidth": 80,
+        "htmlWhitespaceSensitivity": "ignore"
+      }
+    },
+    {
+      "files": [
+        "index.html"
+      ],
+      "options": {
+        "parser": "html",
+        "printWidth": 120,
+        "htmlWhitespaceSensitivity": "strict"
+      }
+    },
+    {
+      "files": [
+        "*.css",
+        "*.scss"
+      ],
+      "options": {
+        "printWidth": 80,
+        "singleQuote": false
+      }
+    },
+    {
+      "files": [
+        "*.json"
+      ],
+      "options": {
+        "printWidth": 1
+      }
+    }
+  ]
+}
