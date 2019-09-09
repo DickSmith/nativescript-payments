@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.billingclient:billing:1.2'
+    compile 'com.android.billingclient:billing:1.2.2'
 }
 
 task getDeps(type: Copy) {
